@@ -69,7 +69,7 @@
             <span id="syncTime" class="text-slate-500"></span>
         </div>
 
-        <!-- PAGE 1: LOGIN PEMILIH -->
+        <!-- PAGE 1: LOGIN PEMILIH (SAMPEL/CONTOH TELAH DIHAPUS) -->
         <section id="pageLogin" class="max-w-md mx-auto my-10 bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-200">
             <div class="text-center mb-6">
                 <div class="inline-block p-3 bg-sky-100 text-brandSecondary rounded-full mb-2">
@@ -98,34 +98,34 @@
             </div>
         </section>
 
-        <!-- PAGE 2: BILIK SUARA (BINGKAI POSTER LEBIH BESAR) -->
-        <section id="pageVoting" class="hidden space-y-10">
+        <!-- PAGE 2: BILIK SUARA (VOTING MEMAKAI POSTER PHOTO) -->
+        <section id="pageVoting" class="hidden space-y-8">
             <div class="bg-blue-50 border-l-4 border-brandSecondary p-4 rounded-r-lg flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800" id="voterWelcome">Selamat Datang, Pemilih!</h2>
-                    <p class="text-xs text-slate-600">Klik kartu paslon untuk melihat poster dan menentukan pilihan Ketua OSIS & MPK.</p>
+                    <p class="text-xs text-slate-600">Klik kartu paslon untuk melihat dan menentukan pilihan Ketua OSIS & MPK.</p>
                 </div>
                 <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
             </div>
 
             <!-- PASLON OSIS -->
             <div>
-                <div class="flex items-center space-x-2 mb-6">
-                    <span class="bg-brandPrimary text-white font-bold px-3.5 py-1 rounded-lg text-base">1</span>
-                    <h3 class="text-2xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
+                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 max-w-6xl mx-auto" id="containerOsis"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerOsis"></div>
             </div>
 
-            <hr class="border-slate-300 my-8">
+            <hr class="border-slate-300 my-6">
 
             <!-- PASLON MPK -->
             <div>
-                <div class="flex items-center space-x-2 mb-6">
-                    <span class="bg-brandSecondary text-white font-bold px-3.5 py-1 rounded-lg text-base">2</span>
-                    <h3 class="text-2xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
+                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 max-w-6xl mx-auto" id="containerMpk"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
             </div>
 
             <!-- TOMBOL KIRIM SUARA -->
@@ -243,7 +243,7 @@
                 </div>
             </div>
 
-            <!-- TABEL DPT MANAJEMEN -->
+            <!-- TABEL DPT MANAJEMEN DENGAN NAVIGASI SAMPAI DATA 639 -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-3">
                     <div>
@@ -323,7 +323,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Poster Visi & Misi</label>
                     <div class="flex flex-col items-center space-y-2">
-                        <img id="paslonPreviewImg" src="" class="w-full h-56 rounded-lg object-contain border bg-slate-100 p-1">
+                        <img id="paslonPreviewImg" src="" class="w-full h-48 rounded-lg object-contain border bg-slate-100 p-1">
                         <input type="text" id="paslonFoto" required placeholder="URL Poster atau Base64 Gambar" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                     </div>
                 </div>
@@ -391,15 +391,15 @@
         const db = firebase.database();
 
         let paslonOsis = [
-            { id: "O1", no: "01", nama: "Alena Syifa Syafii", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Alena" },
-            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Farzin" }
+            { id: "O1", no: "01", nama: "Alena Syifa Syafii", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Alena" },
+            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Farzin" }
         ];
 
         let paslonMpk = [
-            { id: "M1", no: "01", nama: "Shita Avara Nallini", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Shita" },
-            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Najwa" },
-            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Thyrisa" },
-            { id: "M4", no: "04", nama: "Zizi Amirah Azka", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Zizi" }
+            { id: "M1", no: "01", nama: "Shita Avara Nallini", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Shita" },
+            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Najwa" },
+            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Thyrisa" },
+            { id: "M4", no: "04", nama: "Zizi Amirah Azka", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Zizi" }
         ];
 
         let dptData = {};
@@ -480,14 +480,14 @@
                 fileReader.onload = function() {
                     const typedarray = new Uint8Array(this.result);
                     pdfjsLib.getDocument(typedarray).promise.then(pdf => pdf.getPage(1)).then(page => {
-                        const viewport = page.getViewport({ scale: 2 border: true });
+                        const viewport = page.getViewport({ scale: 1.5 });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
                         canvas.height = viewport.height;
                         canvas.width = viewport.width;
 
                         page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
-                            const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+                            const base64Image = canvas.toDataURL('image/jpeg', 0.85);
                             document.getElementById('paslonFoto').value = base64Image;
                             document.getElementById('paslonPreviewImg').src = base64Image;
                             Swal.close();
@@ -499,28 +499,28 @@
             }
         }
 
-        // BINGKAI FOTO POSTER KANDIDAT YANG JAUH LEBIH BESAR (Tinggi: h-[520px])
+        // TAMPILAN KARTU PASLON BERISI POSTER GAMBAR UTUH
         function renderBallotCards() {
             document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
-                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-5 shadow-md hover:shadow-xl cursor-pointer transition-all duration-200 relative flex flex-col justify-between overflow-hidden">
-                    <div class="absolute top-6 right-6 bg-brandPrimary text-white font-black text-sm w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white">${p.no}</div>
+                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-brandPrimary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-1">
-                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
+                        <div class="w-full h-80 rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
+                            <img src="${p.foto}" class="w-full h-full object-cover">
                         </div>
-                        <h4 class="font-black text-center text-slate-800 text-lg uppercase tracking-wide my-2">${p.nama}</h4>
+                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
 
             document.getElementById('containerMpk').innerHTML = paslonMpk.map(p => `
-                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-5 shadow-md hover:shadow-xl cursor-pointer transition-all duration-200 relative flex flex-col justify-between overflow-hidden">
-                    <div class="absolute top-6 right-6 bg-brandSecondary text-white font-black text-sm w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white">${p.no}</div>
+                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-brandSecondary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-1">
-                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
+                        <div class="w-full h-80 rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
+                            <img src="${p.foto}" class="w-full h-full object-cover">
                         </div>
-                        <h4 class="font-black text-center text-slate-800 text-lg uppercase tracking-wide my-2">${p.nama}</h4>
+                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
@@ -529,14 +529,14 @@
         function selectCandidate(type, id) {
             if (type === 'OSIS') {
                 selectedOsis = id;
-                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50', 'ring-4', 'ring-brandPrimary/30'));
-                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50', 'ring-4', 'ring-brandPrimary/30');
+                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50', 'ring-2', 'ring-brandPrimary'));
+                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50', 'ring-2', 'ring-brandPrimary');
                 const paslon = paslonOsis.find(p => p.id === id);
                 document.getElementById('summaryOsis').innerText = `Paslon ${paslon.no}`;
             } else {
                 selectedMpk = id;
-                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50', 'ring-4', 'ring-brandSecondary/30'));
-                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50', 'ring-4', 'ring-brandSecondary/30');
+                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50', 'ring-2', 'ring-brandSecondary'));
+                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50', 'ring-2', 'ring-brandSecondary');
                 const paslon = paslonMpk.find(p => p.id === id);
                 document.getElementById('summaryMpk').innerText = `Paslon ${paslon.no}`;
             }
