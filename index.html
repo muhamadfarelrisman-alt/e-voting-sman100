@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Voting OSIS & MPK - SMAN 100 Jakarta</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SheetJS (xlsx) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- PDF.js Library untuk Ekstrak PDF ke Foto -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Firebase SDK (v9 compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandPrimary: '#1e3a8a',
+                        brandSecondary: '#0284c7',
+                        brandAccent: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-brandPrimary text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white text-brandPrimary rounded-full flex items-center justify-center font-bold text-lg shadow">
+                    100
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg md:text-xl leading-tight">E-VOTING SMAN 100 JAKARTA</h1>
+                    <p class="text-xs text-slate-200">NPSN: 20103294 | Pemilihan OSIS & MPK</p>
+                </div>
+            </div>
+            <div>
+                <button id="navBtn" onclick="toggleNav()" class="bg-brandSecondary hover:bg-sky-600 px-3 py-1.5 rounded-lg text-xs md:text-sm font-semibold transition">
+                    <i class="fa-solid fa-lock mr-1" id="navBtnIcon"></i> <span id="navBtnText">Panel Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- STATUS KONEKSI DATABASE -->
+        <div id="connectionBanner" class="mb-4 p-2 bg-amber-100 text-amber-800 border border-amber-300 rounded-lg text-xs flex items-center justify-between">
+            <span><i class="fa-solid fa-wifi mr-2"></i> Status Database: <strong id="dbStatus">Menghubungkan ke Firebase...</strong></span>
+            <span id="syncTime" class="text-slate-500"></span>
+        </div>
+
+        <!-- PAGE 1: LOGIN PEMILIH -->
+        <section id="pageLogin" class="max-w-md mx-auto my-10 bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-200">
+            <div class="text-center mb-6">
+                <div class="inline-block p-3 bg-sky-100 text-brandSecondary rounded-full mb-2">
+                    <i class="fa-solid fa-user-check text-3xl"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Masuk Bilik Suara</h2>
+                <p class="text-xs text-slate-500 mt-1">Masukkan NIS Siswa dan Token Unik dari Panitia</p>
+            </div>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIS Siswa</label>
+                    <input type="text" id="loginNis" placeholder="Contoh: 11597" required 
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brandSecondary focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token Pemilih</label>
+                    <input type="password" id="loginToken" placeholder="Contoh: TK1001" required 
+                        class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brandSecondary focus:outline-none transition uppercase">
+                </div>
+                <button type="submit" class="w-full py-3 bg-brandPrimary hover:bg-blue-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition">
+                    Mulai Memilih <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+            <div class="mt-6 text-center text-xs text-slate-400">
+                <p>Setiap token hanya berlaku untuk 1 kali penggunaan.</p>
+            </div>
+        </section>
+
+        <!-- PAGE 2: BILIK SUARA (VOTING) -->
+        <section id="pageVoting" class="hidden space-y-8">
+            <div class="bg-blue-50 border-l-4 border-brandSecondary p-4 rounded-r-lg flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800" id="voterWelcome">Selamat Datang, Pemilih!</h2>
+                    <p class="text-xs text-slate-600">Silahkan tentukan pilihan Anda untuk Ketua OSIS dan Ketua MPK SMAN 100 Jakarta.</p>
+                </div>
+                <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
+            </div>
+
+            <!-- PASLON OSIS -->
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
+                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerOsis"></div>
+            </div>
+
+            <hr class="border-slate-300 my-6">
+
+            <!-- PASLON MPK -->
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
+                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
+            </div>
+
+            <!-- TOMBOL KIRIM SUARA -->
+            <div class="sticky bottom-4 bg-white p-4 rounded-xl shadow-2xl border border-slate-200 flex justify-between items-center z-30">
+                <div>
+                    <p class="text-xs text-slate-500">Pilihan Terpilih:</p>
+                    <p class="text-sm font-bold text-slate-800">
+                        OSIS: <span id="summaryOsis" class="text-brandPrimary">Belum Dipilih</span> | 
+                        MPK: <span id="summaryMpk" class="text-brandSecondary">Belum Dipilih</span>
+                    </p>
+                </div>
+                <button onclick="submitBallot()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Kirim Suara
+                </button>
+            </div>
+        </section>
+
+        <!-- PAGE 3: DASHBOARD ADMIN -->
+        <section id="pageAdmin" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Dashboard Panitia / KPUM</h2>
+                    <p class="text-xs text-slate-500">Hasil Quick Count dan Rekapitulasi Pemilihan SMAN 100 Jakarta</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="processExcelImport(event)">
+                    
+                    <button onclick="openDptModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-user-plus mr-1.5"></i> Tambah DPT
+                    </button>
+                    <button onclick="triggerExcelUpload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-file-import mr-1.5"></i> Impor DPT
+                    </button>
+                    <button onclick="resetAllDPT()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-users-slash mr-1.5"></i> Reset DPT
+                    </button>
+                    <button onclick="resetAllVotes()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-trash-arrow-up mr-1.5"></i> Reset Suara
+                    </button>
+                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-file-excel mr-1.5"></i> Ekspor Excel
+                    </button>
+                    <button onclick="logoutAdmin()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-bold transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATS COUNTER -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold uppercase">Total DPT</p>
+                        <h3 class="text-2xl font-black text-slate-800" id="statTotalDpt">0</h3>
+                    </div>
+                    <div class="p-3 bg-slate-100 text-slate-600 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold uppercase">Suara Masuk</p>
+                        <h3 class="text-2xl font-black text-emerald-600" id="statSuaraMasuk">0</h3>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-vote-yea text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold uppercase">Belum Memilih</p>
+                        <h3 class="text-2xl font-black text-amber-600" id="statBelumMemilih">0</h3>
+                    </div>
+                    <div class="p-3 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-user-clock text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold uppercase">Partisipasi</p>
+                        <h3 class="text-2xl font-black text-brandPrimary" id="statPartisipasi">0%</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-brandPrimary rounded-lg"><i class="fa-solid fa-chart-line text-xl"></i></div>
+                </div>
+            </div>
+
+            <!-- KELOLA PASLON SECTION -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="font-bold text-slate-800 mb-4 flex items-center justify-between">
+                    <span><i class="fa-solid fa-id-card text-brandPrimary mr-2"></i> Pengelolaan Kandidat OSIS & MPK</span>
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold text-xs uppercase text-slate-500 mb-2">Kandidat OSIS</h4>
+                        <div id="adminPaslonOsis" class="space-y-2"></div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xs uppercase text-slate-500 mb-2">Kandidat MPK</h4>
+                        <div id="adminPaslonMpk" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS QUICK COUNT -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-chart-pie text-brandPrimary mr-2"></i> Perolehan Suara OSIS
+                    </h3>
+                    <div class="relative h-64">
+                        <canvas id="chartOsis"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-chart-bar text-brandSecondary mr-2"></i> Perolehan Suara MPK
+                    </h3>
+                    <div class="relative h-64">
+                        <canvas id="chartMpk"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL DPT MANAJEMEN DENGAN NAVIGASI SAMPAI DATA 639 -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-3">
+                    <div>
+                        <h3 class="font-bold text-slate-800" id="titleDptTable">Daftar Pemilih Tetap</h3>
+                        <p class="text-[11px] text-slate-500">Atur jumlah tampilan data untuk memeriksa seluruh 639 data siswa.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <!-- Tampilkan Jumlah Baris -->
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xs font-semibold text-slate-600">Tampil:</span>
+                            <select id="selectRowsPerPage" onchange="updateRowsPerPage()" class="px-2 py-1 text-xs rounded-lg border border-slate-300 focus:outline-none font-semibold">
+                                <option value="10">10 Data</option>
+                                <option value="25">25 Data</option>
+                                <option value="50">50 Data</option>
+                                <option value="100">100 Data</option>
+                                <option value="ALL">Semua Data (639+)</option>
+                            </select>
+                        </div>
+                        <input type="text" id="searchDpt" oninput="renderDptTable()" placeholder="Cari NIS / Nama..." 
+                            class="px-3 py-1 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-1 focus:ring-brandPrimary w-full sm:w-36">
+                        <select id="filterStatus" onchange="renderDptTable()" class="px-2 py-1 text-xs rounded-lg border border-slate-300 focus:outline-none">
+                            <option value="ALL">Semua Status</option>
+                            <option value="SUDAH">Sudah Memilih</option>
+                            <option value="BELUM">Belum Memilih</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto max-h-[500px]">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase sticky top-0 z-10">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">NIS</th>
+                                <th class="p-3">Nama Siswa</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Token</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDpt" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+                <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs">
+                    <span id="tableInfo" class="font-semibold text-slate-600">Menampilkan data...</span>
+                    
+                    <!-- FITUR LOMPAT KE HALAMAN UTK CEK DATA TERAKHIR/639 -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-slate-500 font-medium">Ke Halaman:</span>
+                        <input type="number" id="gotoPageInput" min="1" placeholder="Hal" class="w-12 px-2 py-0.5 border rounded text-center text-xs">
+                        <button onclick="gotoPage()" class="px-2 py-0.5 bg-brandSecondary text-white rounded text-xs font-bold">Go</button>
+                        <div class="flex space-x-1 ml-2" id="tablePagination"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL EDIT PASLON -->
+    <div id="modalPaslon" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h3 class="text-lg font-bold text-slate-800 mb-4" id="modalPaslonTitle">Edit Data Kandidat</h3>
+            <form onsubmit="savePaslon(event)" class="space-y-4">
+                <input type="hidden" id="paslonCategory">
+                <input type="hidden" id="paslonId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Paslon</label>
+                    <input type="text" id="paslonNama" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Foto Paslon (Upload PDF / Gambar)</label>
+                    <input type="file" id="paslonPdfFile" accept="application/pdf, image/*" onchange="convertPdfToImage(event)"
+                        class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-brandSecondary hover:file:bg-sky-100 border rounded-lg">
+                    <p class="text-[10px] text-slate-400 mt-1">*Pilih file PDF (halaman 1 otomatis jadi foto) atau gambar JPG/PNG.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Foto Paslon</label>
+                    <div class="flex items-center space-x-3">
+                        <img id="paslonPreviewImg" src="" class="w-16 h-16 rounded-full object-cover border bg-slate-100">
+                        <input type="text" id="paslonFoto" required placeholder="URL Foto atau Base64" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Visi</label>
+                    <textarea id="paslonVisi" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Misi</label>
+                    <textarea id="paslonMisi" rows="3" placeholder="Gunakan tanda koma (,) untuk memisahkan poin misi" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closePaslonModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-brandPrimary hover:bg-blue-900 text-white font-bold rounded-lg text-xs">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DPT MANUAL -->
+    <div id="modalDpt" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <h3 class="text-lg font-bold text-slate-800 mb-4" id="modalDptTitle">Tambah DPT Manual</h3>
+            <form onsubmit="saveDptManual(event)" class="space-y-4">
+                <input type="hidden" id="editDocId">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIS</label>
+                    <input type="text" id="modalNis" placeholder="Nomor Induk Siswa" required 
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Siswa</label>
+                    <input type="text" id="modalNama" placeholder="Nama Lengkap" required 
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kelas</label>
+                    <input type="text" id="modalKelas" placeholder="Contoh: X-1, XII-IPA1" required 
+                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="modalToken" placeholder="Contoh: TK1001" required 
+                            class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary uppercase">
+                        <button type="button" onclick="generateSequentialToken()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg transition">Otomatis</button>
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeDptModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-brandPrimary hover:bg-blue-900 text-white font-bold rounded-lg text-xs">Simpan Data</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>© 2026 KPUM SMAN 100 Jakarta. Sistem E-Voting Terintegrasi Cloud Realtime.</p>
+    </footer>
+
+    <!-- JAVASCRIPT UTAMA -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBoS1kNu_3qz79_Qw_RG3QS1VFQVi0SBQ",
+            authDomain: "evoting-sman100jkt.firebaseapp.com",
+            databaseURL: "https://evoting-sman100jkt-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "evoting-sman100jkt",
+            storageBucket: "evoting-sman100jkt.firebasestorage.app",
+            messagingSenderId: "357670925877",
+            appId: "1:357670925877:web:e8fa1ced0bd9adc474a37c",
+            measurementId: "G-59VTKPNZSC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let paslonOsis = [
+            { id: "O1", no: "01", nama: "Alena Syifa Syafii", visi: "Mewujudkan OSIS SMAN 100 Jakarta yang Inovatif dan Berintegritas.", misi: "Meningkatkan solidaritas siswa, Menyelenggarakan kegiatan edukatif", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alena" },
+            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", visi: "Meningkatkan prestasi akademis dan non-akademis siswa berbasis digital.", misi: "Digitalisasi program OSIS, Pelatihan kepemimpinan", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Farzin" }
+        ];
+
+        // DITAMBAHKAN 2 CALON KETUA MPK BARU (PASLON 03 & 04)
+        let paslonMpk = [
+            { id: "M1", no: "01", nama: "Shita Avara Nallini", visi: "Mengawasi kinerja OSIS secara transparan dan akuntabel.", misi: "Evaluasi rutin program OSIS, Transparansi publikasi", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Shita" },
+            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", visi: "Menampung dan memperjuangkan aspirasi seluruh siswa SMAN 100.", misi: "Kotak aspirasi digital, Forum diskusi berkala", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Najwa" },
+            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", visi: "Mewujudkan MPK SMAN 100 Jakarta yang responsif, profesional, dan solutif.", misi: "Optimalisasi penyerapan aspirasi, Peningkatan pengawasan program sekolah", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Thyrisa" },
+            { id: "M4", no: "04", nama: "Zizi Amirah Azka", visi: "Menjadikan MPK sebagai jembatan aspirasi siswa yang kokoh dan berintegritas tinggi.", misi: "Forum terbuka berkala, Advokasi hak dan prestasi siswa", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zizi" }
+        ];
+
+        let dptData = {};
+        let votesData = {};
+        let currentVoter = null;
+        let selectedOsis = null;
+        let selectedMpk = null;
+        let isAdminLoggedIn = false;
+        let chartOsisInstance = null;
+        let chartMpkInstance = null;
+        let currentPage = 1;
+        let rowsPerPage = 10;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const paslonFotoInput = document.getElementById('paslonFoto');
+            if (paslonFotoInput) {
+                paslonFotoInput.addEventListener('input', (e) => {
+                    document.getElementById('paslonPreviewImg').src = e.target.value;
+                });
+            }
+
+            db.ref('.info/connected').on('value', (snap) => {
+                const connected = snap.val();
+                const dbStatus = document.getElementById('dbStatus');
+                const banner = document.getElementById('connectionBanner');
+                if (connected) {
+                    dbStatus.innerText = "Terhubung (Realtime Cloud)";
+                    banner.className = "mb-4 p-2 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs flex items-center justify-between";
+                } else {
+                    dbStatus.innerText = "Terputus / Offline";
+                    banner.className = "mb-4 p-2 bg-rose-100 text-rose-800 border border-rose-300 rounded-lg text-xs flex items-center justify-between";
+                }
+            });
+
+            db.ref('candidates/osis').on('value', (snap) => {
+                if (snap.exists()) paslonOsis = snap.val();
+                renderBallotCards();
+                renderAdminCandidates();
+            });
+
+            db.ref('candidates/mpk').on('value', (snap) => {
+                if (snap.exists()) paslonMpk = snap.val();
+                renderBallotCards();
+                renderAdminCandidates();
+            });
+
+            db.ref('dpt').on('value', (snapshot) => {
+                dptData = snapshot.val() || {};
+                updateAdminDashboard();
+                document.getElementById('syncTime').innerText = "Sync: " + new Date().toLocaleTimeString();
+            });
+
+            db.ref('votes').on('value', (snapshot) => {
+                votesData = snapshot.val() || {};
+                updateAdminDashboard();
+            });
+        });
+
+        function convertPdfToImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('paslonFoto').value = e.target.result;
+                    document.getElementById('paslonPreviewImg').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            if (file.type === 'application/pdf') {
+                Swal.fire({ title: 'Membaca PDF...', text: 'Mengonversi halaman pertama PDF ke gambar.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                const fileReader = new FileReader();
+                fileReader.onload = function() {
+                    const typedarray = new Uint8Array(this.result);
+                    pdfjsLib.getDocument(typedarray).promise.then(pdf => pdf.getPage(1)).then(page => {
+                        const viewport = page.getViewport({ scale: 1.5 });
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
+                            const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+                            document.getElementById('paslonFoto').value = base64Image;
+                            document.getElementById('paslonPreviewImg').src = base64Image;
+                            Swal.close();
+                            Swal.fire('Sukses', 'PDF berhasil diubah menjadi foto paslon!', 'success');
+                        });
+                    }).catch(() => Swal.fire('Gagal', 'File PDF tidak valid.', 'error'));
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        }
+
+        function renderBallotCards() {
+            document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
+                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-xl border-2 border-slate-200 p-4 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between">
+                    <div class="absolute top-3 right-3 bg-brandPrimary text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">${p.no}</div>
+                    <div>
+                        <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full bg-slate-100 mb-3 border object-cover">
+                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
+                        <p class="text-xs text-slate-600 text-center font-semibold mb-2">"${p.visi}"</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('containerMpk').innerHTML = paslonMpk.map(p => `
+                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-xl border-2 border-slate-200 p-4 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between">
+                    <div class="absolute top-3 right-3 bg-brandSecondary text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">${p.no}</div>
+                    <div>
+                        <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full bg-slate-100 mb-3 border object-cover">
+                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
+                        <p class="text-xs text-slate-600 text-center font-semibold mb-2">"${p.visi}"</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectCandidate(type, id) {
+            if (type === 'OSIS') {
+                selectedOsis = id;
+                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50'));
+                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50');
+                const paslon = paslonOsis.find(p => p.id === id);
+                document.getElementById('summaryOsis').innerText = `Paslon ${paslon.no}`;
+            } else {
+                selectedMpk = id;
+                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50'));
+                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50');
+                const paslon = paslonMpk.find(p => p.id === id);
+                document.getElementById('summaryMpk').innerText = `Paslon ${paslon.no}`;
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const nis = document.getElementById('loginNis').value.trim();
+            const token = document.getElementById('loginToken').value.trim().toUpperCase();
+
+            const allVoters = Object.values(dptData);
+            const voter = allVoters.find(v => String(v.nis) === nis && String(v.token) === token);
+
+            if (!voter) return Swal.fire('Gagal Login', 'NIS / Token tidak valid!', 'error');
+            if (voter.status === 'SUDAH') return Swal.fire('Hak Pilih Habis', 'Siswa ini sudah memilih!', 'warning');
+
+            currentVoter = voter;
+            document.getElementById('voterWelcome').innerText = `Selamat Datang, ${voter.nama} (${voter.kelas})`;
+            document.getElementById('pageLogin').classList.add('hidden');
+            document.getElementById('pageVoting').classList.remove('hidden');
+        }
+
+        function submitBallot() {
+            if (!selectedOsis || !selectedMpk) return Swal.fire('Pilihan Belum Lengkap', 'Pilih 1 OSIS & 1 MPK!', 'warning');
+
+            Swal.fire({
+                title: 'Kirim Suara?',
+                text: 'Pilihan tidak dapat diubah setelah dikirim.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Kirim'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    const voteId = db.ref('votes').push().key;
+                    const docKey = currentVoter.id;
+                    const updates = {};
+                    updates[`/votes/${voteId}`] = { nis: currentVoter.nis, osis: selectedOsis, mpk: selectedMpk, timestamp: new Date().toISOString() };
+                    updates[`/dpt/${docKey}/status`] = 'SUDAH';
+
+                    db.ref().update(updates).then(() => {
+                        Swal.fire('Berhasil', 'Terima kasih telah memilih!', 'success').then(() => {
+                            location.reload();
+                        });
+                    });
+                }
+            });
+        }
+
+        function toggleNav() {
+            if (isAdminLoggedIn) {
+                location.reload();
+            } else {
+                Swal.fire({
+                    title: 'Otentikasi Admin',
+                    input: 'password',
+                    inputPlaceholder: 'Password',
+                    showCancelButton: true
+                }).then((res) => {
+                    if (res.value === '100SEMPURNA') {
+                        isAdminLoggedIn = true;
+                        document.getElementById('pageLogin').classList.add('hidden');
+                        document.getElementById('pageVoting').classList.add('hidden');
+                        document.getElementById('pageAdmin').classList.remove('hidden');
+                        updateAdminDashboard();
+                        renderAdminCandidates();
+                    } else if(res.isConfirmed) {
+                        Swal.fire('Gagal', 'Password Salah!', 'error');
+                    }
+                });
+            }
+        }
+
+        function logoutAdmin() { toggleNav(); }
+
+        function triggerExcelUpload() { document.getElementById('excelFileInput').click(); }
+
+        function processExcelImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (evt) {
+                const data = new Uint8Array(evt.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
+
+                if (jsonData.length === 0) return Swal.fire('File Kosong', 'Tidak ada data di Excel.', 'error');
+
+                const updates = {};
+                let validCount = 0;
+
+                jsonData.forEach((row, index) => {
+                    const nis = String(row.NIS || row.nis || row.Nis || '').trim();
+                    const nama = String(row.Nama || row.nama || row.NAMA || '').trim();
+                    const kelas = String(row.Kelas || row.kelas || row.KELAS || '').trim();
+                    
+                    let token = String(row.Token || row.token || row.TOKEN || '').trim().toUpperCase();
+                    if (!token) {
+                        token = `TK${1001 + index}`;
+                    }
+
+                    const docKey = `dpt_${String(index + 1).padStart(4, '0')}`;
+
+                    if (nis || nama) {
+                        updates[`/dpt/${docKey}`] = { 
+                            id: docKey,
+                            nis: nis || `-`, 
+                            nama: nama || `-`, 
+                            kelas: kelas || `-`, 
+                            token: token, 
+                            status: 'BELUM', 
+                            rowOrder: index + 1
+                        };
+                        validCount++;
+                    }
+                });
+
+                db.ref('dpt').set(null).then(() => {
+                    return db.ref().update(updates);
+                }).then(() => {
+                    Swal.fire('Sukses Impor', `Berhasil mengunggah ${validCount} DPT dari data ke-1 sampai data ke-${validCount}!`, 'success');
+                }).catch(err => Swal.fire('Error Impor', err.message, 'error'));
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateRowsPerPage() {
+            const val = document.getElementById('selectRowsPerPage').value;
+            if (val === 'ALL') {
+                rowsPerPage = 99999;
+            } else {
+                rowsPerPage = parseInt(val);
+            }
+            currentPage = 1;
+            renderDptTable();
+        }
+
+        function gotoPage() {
+            const pageInput = parseInt(document.getElementById('gotoPageInput').value);
+            if (pageInput && pageInput > 0) {
+                currentPage = pageInput;
+                renderDptTable();
+            }
+        }
+
+        function renderDptTable() {
+            const search = document.getElementById('searchDpt').value.toLowerCase();
+            const filter = document.getElementById('filterStatus').value;
+            
+            let allDpt = Object.entries(dptData).map(([key, val]) => ({ id: key, ...val }));
+
+            allDpt.sort((a, b) => (a.rowOrder || 0) - (b.rowOrder || 0));
+
+            let filtered = allDpt.filter(item => {
+                const matchSearch = (item.nis && String(item.nis).toLowerCase().includes(search)) || 
+                                    (item.nama && String(item.nama).toLowerCase().includes(search));
+                const matchFilter = filter === 'ALL' || item.status === filter;
+                return matchSearch && matchFilter;
+            });
+
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / rowsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const paged = filtered.slice(start, start + rowsPerPage);
+
+            document.getElementById('tbodyDpt').innerHTML = paged.map((item, index) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-slate-600">${item.rowOrder || (start + index + 1)}</td>
+                    <td class="p-3 font-semibold">${item.nis}</td>
+                    <td class="p-3 font-bold text-slate-800">${item.nama}</td>
+                    <td class="p-3">${item.kelas}</td>
+                    <td class="p-3"><code class="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-bold">${item.token}</code></td>
+                    <td class="p-3">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${item.status === 'SUDAH' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${item.status === 'SUDAH' ? 'Sudah Memilih' : 'Belum Memilih'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center space-x-1">
+                        <button onclick="editDpt('${item.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteDpt('${item.id}')" class="px-2 py-1 bg-rose-500 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('tableInfo').innerText = `Menampilkan ${total === 0 ? 0 : start + 1} - ${Math.min(start + rowsPerPage, total)} dari ${total} DPT`;
+
+            let pageBtns = '';
+            let maxVisibleBtns = 5;
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + maxVisibleBtns - 1);
+
+            if (startPage > 1) {
+                pageBtns += `<button onclick="changePage(1)" class="px-2 py-1 rounded text-xs font-bold bg-slate-200 text-slate-700">1</button>`;
+                if (startPage > 2) pageBtns += `<span class="text-xs text-slate-400">...</span>`;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pageBtns += `<button onclick="changePage(${i})" class="px-2.5 py-1 rounded text-xs font-bold ${i === currentPage ? 'bg-brandPrimary text-white' : 'bg-slate-200 text-slate-700'}">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) pageBtns += `<span class="text-xs text-slate-400">...</span>`;
+                pageBtns += `<button onclick="changePage(${totalPages})" class="px-2 py-1 rounded text-xs font-bold bg-slate-200 text-slate-700">${totalPages}</button>`;
+            }
+
+            document.getElementById('tablePagination').innerHTML = pageBtns;
+        }
+
+        function changePage(p) { currentPage = p; renderDptTable(); }
+
+        function updateAdminDashboard() {
+            if (!isAdminLoggedIn) return;
+            const totalDpt = Object.keys(dptData).length;
+            const votesArr = Object.values(votesData);
+            const suaraMasuk = votesArr.length;
+
+            document.getElementById('statTotalDpt').innerText = totalDpt;
+            document.getElementById('statSuaraMasuk').innerText = suaraMasuk;
+            document.getElementById('statBelumMemilih').innerText = Math.max(0, totalDpt - suaraMasuk);
+            document.getElementById('statPartisipasi').innerText = (totalDpt > 0 ? ((suaraMasuk / totalDpt) * 100).toFixed(1) : 0) + '%';
+
+            renderCharts(votesArr);
+            renderDptTable();
+        }
+
+        function renderCharts(votesArr) {
+            const osisCounts = {};
+            paslonOsis.forEach(p => osisCounts[p.id] = 0);
+            votesArr.forEach(v => { if(osisCounts[v.osis] !== undefined) osisCounts[v.osis]++; });
+
+            const mpkCounts = {};
+            paslonMpk.forEach(p => mpkCounts[p.id] = 0);
+            votesArr.forEach(v => { if(mpkCounts[v.mpk] !== undefined) mpkCounts[v.mpk]++; });
+
+            const ctxOsis = document.getElementById('chartOsis').getContext('2d');
+            if (chartOsisInstance) chartOsisInstance.destroy();
+            chartOsisInstance = new Chart(ctxOsis, {
+                type: 'doughnut',
+                data: {
+                    labels: paslonOsis.map(p => `Paslon ${p.no}`),
+                    datasets: [{ data: paslonOsis.map(p => osisCounts[p.id]), backgroundColor: ['#1e3a8a', '#0284c7', '#f59e0b', '#10b981'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctxMpk = document.getElementById('chartMpk').getContext('2d');
+            if (chartMpkInstance) chartMpkInstance.destroy();
+            chartMpkInstance = new Chart(ctxMpk, {
+                type: 'bar',
+                data: {
+                    labels: paslonMpk.map(p => `Paslon ${p.no}`),
+                    datasets: [{ label: 'Suara', data: paslonMpk.map(p => mpkCounts[p.id]), backgroundColor: ['#0284c7', '#38bdf8', '#0284c7', '#0369a1'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function renderAdminCandidates() {
+            if (!isAdminLoggedIn) return;
+            document.getElementById('adminPaslonOsis').innerHTML = paslonOsis.map(p => `
+                <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
+                    <div class="flex items-center space-x-2">
+                        <img src="${p.foto}" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
+                    </div>
+                    <button onclick="openPaslonModal('osis', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs">Edit</button>
+                </div>
+            `).join('');
+
+            document.getElementById('adminPaslonMpk').innerHTML = paslonMpk.map(p => `
+                <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
+                    <div class="flex items-center space-x-2">
+                        <img src="${p.foto}" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
+                    </div>
+                    <button onclick="openPaslonModal('mpk', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs">Edit</button>
+                </div>
+            `).join('');
+        }
+
+        function openPaslonModal(category, id) {
+            const list = category === 'osis' ? paslonOsis : paslonMpk;
+            const target = list.find(p => p.id === id);
+            if (!target) return;
+
+            document.getElementById('paslonCategory').value = category;
+            document.getElementById('paslonId').value = id;
+            document.getElementById('paslonNama').value = target.nama;
+            document.getElementById('paslonFoto').value = target.foto;
+            document.getElementById('paslonPreviewImg').src = target.foto;
+            document.getElementById('paslonVisi').value = target.visi;
+            document.getElementById('paslonMisi').value = target.misi || '';
+            document.getElementById('modalPaslonTitle').innerText = `Edit Paslon ${category.toUpperCase()} (${target.no})`;
+            document.getElementById('modalPaslon').classList.remove('hidden');
+            document.getElementById('modalPaslon').classList.add('flex');
+        }
+
+        function closePaslonModal() {
+            document.getElementById('modalPaslon').classList.add('hidden');
+            document.getElementById('modalPaslon').classList.remove('flex');
+        }
+
+        function savePaslon(e) {
+            e.preventDefault();
+            const category = document.getElementById('paslonCategory').value;
+            const id = document.getElementById('paslonId').value;
+            const nama = document.getElementById('paslonNama').value.trim();
+            const foto = document.getElementById('paslonFoto').value.trim();
+            const visi = document.getElementById('paslonVisi').value.trim();
+            const misi = document.getElementById('paslonMisi').value.trim();
+
+            const list = category === 'osis' ? [...paslonOsis] : [...paslonMpk];
+            const idx = list.findIndex(p => p.id === id);
+
+            if (idx !== -1) {
+                list[idx] = { ...list[idx], nama, foto, visi, misi };
+                db.ref(`candidates/${category}`).set(list).then(() => {
+                    Swal.fire('Berhasil', 'Data disimpan!', 'success');
+                    closePaslonModal();
+                });
+            }
+        }
+
+        function openDptModal() {
+            document.getElementById('editDocId').value = '';
+            document.getElementById('modalNis').value = '';
+            document.getElementById('modalNama').value = '';
+            document.getElementById('modalKelas').value = '';
+            generateSequentialToken();
+            document.getElementById('modalDpt').classList.remove('hidden');
+            document.getElementById('modalDpt').classList.add('flex');
+        }
+
+        function closeDptModal() {
+            document.getElementById('modalDpt').classList.add('hidden');
+            document.getElementById('modalDpt').classList.remove('flex');
+        }
+
+        function generateSequentialToken() {
+            const nextIndex = Object.keys(dptData).length + 1;
+            document.getElementById('modalToken').value = `TK${1000 + nextIndex}`;
+        }
+
+        function saveDptManual(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editDocId').value;
+            const nis = document.getElementById('modalNis').value.trim();
+            const nama = document.getElementById('modalNama').value.trim();
+            const kelas = document.getElementById('modalKelas').value.trim();
+            const token = document.getElementById('modalToken').value.trim().toUpperCase();
+
+            const docKey = editId || `dpt_${String(Object.keys(dptData).length + 1).padStart(4, '0')}`;
+            const payload = { 
+                id: docKey,
+                nis, nama, kelas, token, 
+                status: dptData[docKey]?.status || 'BELUM', 
+                rowOrder: dptData[docKey]?.rowOrder || (Object.keys(dptData).length + 1)
+            };
+
+            db.ref(`dpt/${docKey}`).set(payload).then(() => {
+                Swal.fire('Berhasil', 'Data DPT disimpan!', 'success');
+                closeDptModal();
+            });
+        }
+
+        function editDpt(id) {
+            const item = dptData[id];
+            if (!item) return;
+            document.getElementById('editDocId').value = id;
+            document.getElementById('modalNis').value = item.nis;
+            document.getElementById('modalNama').value = item.nama;
+            document.getElementById('modalKelas').value = item.kelas;
+            document.getElementById('modalToken').value = item.token;
+            document.getElementById('modalDpt').classList.remove('hidden');
+            document.getElementById('modalDpt').classList.add('flex');
+        }
+
+        function deleteDpt(id) {
+            Swal.fire({ title: 'Hapus DPT?', icon: 'warning', showCancelButton: true }).then((res) => {
+                if (res.isConfirmed) db.ref(`dpt/${id}`).remove();
+            });
+        }
+
+        function exportToExcel() {
+            let allDpt = Object.values(dptData);
+            allDpt.sort((a, b) => (a.rowOrder || 0) - (b.rowOrder || 0));
+            if (allDpt.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data untuk diekspor.', 'info');
+            
+            const exportData = allDpt.map((item, idx) => ({
+                "No": item.rowOrder || (idx + 1),
+                "NIS": item.nis,
+                "Nama Siswa": item.nama,
+                "Kelas": item.kelas,
+                "Token": item.token,
+                "Status": item.status
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "DPT SMAN 100");
+            XLSX.writeFile(wb, "Rekap_DPT_SMAN100.xlsx");
+        }
+
+        function resetAllDPT() {
+            Swal.fire({ title: 'Reset Seluruh DPT?', text: 'Data DPT akan dihapus permanen.', icon: 'warning', showCancelButton: true }).then(res => {
+                if (res.isConfirmed) db.ref('dpt').remove();
+            });
+        }
+
+        function resetAllVotes() {
+            Swal.fire({ title: 'Reset Suara?', text: 'Seluruh perolehan suara akan di-nol-kan.', icon: 'warning', showCancelButton: true }).then(res => {
+                if (res.isConfirmed) {
+                    const updates = {};
+                    updates['/votes'] = null;
+                    Object.keys(dptData).forEach(k => updates[`/dpt/${k}/status`] = 'BELUM');
+                    db.ref().update(updates).then(() => Swal.fire('Berhasil', 'Suara di-reset.', 'success'));
+                }
+            });
+        }
+    </script>
+</body>
+</html>
