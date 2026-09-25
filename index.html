@@ -18,7 +18,7 @@
     <!-- PDF.js Library untuk Ekstrak PDF ke Foto -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-    <!-- Firebase SDK (v9 compat) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -81,12 +81,12 @@
             <form onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIS Siswa</label>
-                    <input type="text" id="loginNis" placeholder="Contoh: 11597" required 
+                    <input type="text" id="loginNis" required 
                         class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brandSecondary focus:outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token Pemilih</label>
-                    <input type="password" id="loginToken" placeholder="Contoh: TK1001" required 
+                    <input type="password" id="loginToken" required 
                         class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-brandSecondary focus:outline-none transition uppercase">
                 </div>
                 <button type="submit" class="w-full py-3 bg-brandPrimary hover:bg-blue-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition">
@@ -98,34 +98,34 @@
             </div>
         </section>
 
-        <!-- PAGE 2: BILIK SUARA (VOTING) -->
-        <section id="pageVoting" class="hidden space-y-8">
+        <!-- PAGE 2: BILIK SUARA (BINGKAI POSTER LEBIH BESAR) -->
+        <section id="pageVoting" class="hidden space-y-10">
             <div class="bg-blue-50 border-l-4 border-brandSecondary p-4 rounded-r-lg flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800" id="voterWelcome">Selamat Datang, Pemilih!</h2>
-                    <p class="text-xs text-slate-600">Silahkan tentukan pilihan Anda untuk Ketua OSIS dan Ketua MPK SMAN 100 Jakarta.</p>
+                    <p class="text-xs text-slate-600">Klik kartu paslon untuk melihat poster dan menentukan pilihan Ketua OSIS & MPK.</p>
                 </div>
                 <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
             </div>
 
             <!-- PASLON OSIS -->
             <div>
-                <div class="flex items-center space-x-2 mb-4">
-                    <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
-                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
+                <div class="flex items-center space-x-2 mb-6">
+                    <span class="bg-brandPrimary text-white font-bold px-3.5 py-1 rounded-lg text-base">1</span>
+                    <h3 class="text-2xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerOsis"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 max-w-6xl mx-auto" id="containerOsis"></div>
             </div>
 
-            <hr class="border-slate-300 my-6">
+            <hr class="border-slate-300 my-8">
 
             <!-- PASLON MPK -->
             <div>
-                <div class="flex items-center space-x-2 mb-4">
-                    <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
-                    <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
+                <div class="flex items-center space-x-2 mb-6">
+                    <span class="bg-brandSecondary text-white font-bold px-3.5 py-1 rounded-lg text-base">2</span>
+                    <h3 class="text-2xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 max-w-6xl mx-auto" id="containerMpk"></div>
             </div>
 
             <!-- TOMBOL KIRIM SUARA -->
@@ -209,7 +209,7 @@
             <!-- KELOLA PASLON SECTION -->
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
                 <h3 class="font-bold text-slate-800 mb-4 flex items-center justify-between">
-                    <span><i class="fa-solid fa-id-card text-brandPrimary mr-2"></i> Pengelolaan Kandidat OSIS & MPK</span>
+                    <span><i class="fa-solid fa-id-card text-brandPrimary mr-2"></i> Pengelolaan Kandidat & Poster (PDF/Foto)</span>
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -243,15 +243,14 @@
                 </div>
             </div>
 
-            <!-- TABEL DPT MANAJEMEN DENGAN NAVIGASI SAMPAI DATA 639 -->
+            <!-- TABEL DPT MANAJEMEN -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-3">
                     <div>
                         <h3 class="font-bold text-slate-800" id="titleDptTable">Daftar Pemilih Tetap</h3>
-                        <p class="text-[11px] text-slate-500">Atur jumlah tampilan data untuk memeriksa seluruh 639 data siswa.</p>
+                        <p class="text-[11px] text-slate-500">Cek status pemilih hingga data ke-639+ dengan fitur kontrol halaman.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                        <!-- Tampilkan Jumlah Baris -->
                         <div class="flex items-center space-x-1">
                             <span class="text-xs font-semibold text-slate-600">Tampil:</span>
                             <select id="selectRowsPerPage" onchange="updateRowsPerPage()" class="px-2 py-1 text-xs rounded-lg border border-slate-300 focus:outline-none font-semibold">
@@ -290,7 +289,6 @@
                 <div class="p-3 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs">
                     <span id="tableInfo" class="font-semibold text-slate-600">Menampilkan data...</span>
                     
-                    <!-- FITUR LOMPAT KE HALAMAN UTK CEK DATA TERAKHIR/639 -->
                     <div class="flex items-center space-x-2">
                         <span class="text-slate-500 font-medium">Ke Halaman:</span>
                         <input type="number" id="gotoPageInput" min="1" placeholder="Hal" class="w-12 px-2 py-0.5 border rounded text-center text-xs">
@@ -303,10 +301,10 @@
 
     </main>
 
-    <!-- MODAL EDIT PASLON -->
+    <!-- MODAL EDIT PASLON & UPLOAD POSTER PDF/FOTO -->
     <div id="modalPaslon" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-bold text-slate-800 mb-4" id="modalPaslonTitle">Edit Data Kandidat</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4" id="modalPaslonTitle">Edit Data & Poster Kandidat</h3>
             <form onsubmit="savePaslon(event)" class="space-y-4">
                 <input type="hidden" id="paslonCategory">
                 <input type="hidden" id="paslonId">
@@ -316,28 +314,20 @@
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Foto Paslon (Upload PDF / Gambar)</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Upload Poster Visi-Misi (File PDF atau Gambar)</label>
                     <input type="file" id="paslonPdfFile" accept="application/pdf, image/*" onchange="convertPdfToImage(event)"
                         class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-brandSecondary hover:file:bg-sky-100 border rounded-lg">
-                    <p class="text-[10px] text-slate-400 mt-1">*Pilih file PDF (halaman 1 otomatis jadi foto) atau gambar JPG/PNG.</p>
+                    <p class="text-[10px] text-slate-400 mt-1">*Jika file PDF diunggah, halaman pertama akan otomatis diubah menjadi poster foto.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Foto Paslon</label>
-                    <div class="flex items-center space-x-3">
-                        <img id="paslonPreviewImg" src="" class="w-16 h-16 rounded-full object-cover border bg-slate-100">
-                        <input type="text" id="paslonFoto" required placeholder="URL Foto atau Base64" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Poster Visi & Misi</label>
+                    <div class="flex flex-col items-center space-y-2">
+                        <img id="paslonPreviewImg" src="" class="w-full h-56 rounded-lg object-contain border bg-slate-100 p-1">
+                        <input type="text" id="paslonFoto" required placeholder="URL Poster atau Base64 Gambar" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Visi</label>
-                    <textarea id="paslonVisi" rows="2" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary"></textarea>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Misi</label>
-                    <textarea id="paslonMisi" rows="3" placeholder="Gunakan tanda koma (,) untuk memisahkan poin misi" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary"></textarea>
-                </div>
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closePaslonModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs">Batal</button>
                     <button type="submit" class="px-4 py-2 bg-brandPrimary hover:bg-blue-900 text-white font-bold rounded-lg text-xs">Simpan Perubahan</button>
@@ -354,24 +344,20 @@
                 <input type="hidden" id="editDocId">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIS</label>
-                    <input type="text" id="modalNis" placeholder="Nomor Induk Siswa" required 
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                    <input type="text" id="modalNis" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Siswa</label>
-                    <input type="text" id="modalNama" placeholder="Nama Lengkap" required 
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                    <input type="text" id="modalNama" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Kelas</label>
-                    <input type="text" id="modalKelas" placeholder="Contoh: X-1, XII-IPA1" required 
-                        class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
+                    <input type="text" id="modalKelas" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Token</label>
                     <div class="flex gap-2">
-                        <input type="text" id="modalToken" placeholder="Contoh: TK1001" required 
-                            class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary uppercase">
+                        <input type="text" id="modalToken" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brandPrimary uppercase">
                         <button type="button" onclick="generateSequentialToken()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg transition">Otomatis</button>
                     </div>
                 </div>
@@ -405,16 +391,15 @@
         const db = firebase.database();
 
         let paslonOsis = [
-            { id: "O1", no: "01", nama: "Alena Syifa Syafii", visi: "Mewujudkan OSIS SMAN 100 Jakarta yang Inovatif dan Berintegritas.", misi: "Meningkatkan solidaritas siswa, Menyelenggarakan kegiatan edukatif", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alena" },
-            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", visi: "Meningkatkan prestasi akademis dan non-akademis siswa berbasis digital.", misi: "Digitalisasi program OSIS, Pelatihan kepemimpinan", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Farzin" }
+            { id: "O1", no: "01", nama: "Alena Syifa Syafii", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Alena" },
+            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Farzin" }
         ];
 
-        // DITAMBAHKAN 2 CALON KETUA MPK BARU (PASLON 03 & 04)
         let paslonMpk = [
-            { id: "M1", no: "01", nama: "Shita Avara Nallini", visi: "Mengawasi kinerja OSIS secara transparan dan akuntabel.", misi: "Evaluasi rutin program OSIS, Transparansi publikasi", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Shita" },
-            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", visi: "Menampung dan memperjuangkan aspirasi seluruh siswa SMAN 100.", misi: "Kotak aspirasi digital, Forum diskusi berkala", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Najwa" },
-            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", visi: "Mewujudkan MPK SMAN 100 Jakarta yang responsif, profesional, dan solutif.", misi: "Optimalisasi penyerapan aspirasi, Peningkatan pengawasan program sekolah", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Thyrisa" },
-            { id: "M4", no: "04", nama: "Zizi Amirah Azka", visi: "Menjadikan MPK sebagai jembatan aspirasi siswa yang kokoh dan berintegritas tinggi.", misi: "Forum terbuka berkala, Advokasi hak dan prestasi siswa", foto: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zizi" }
+            { id: "M1", no: "01", nama: "Shita Avara Nallini", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Shita" },
+            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Najwa" },
+            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Thyrisa" },
+            { id: "M4", no: "04", nama: "Zizi Amirah Azka", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Zizi" }
         ];
 
         let dptData = {};
@@ -473,6 +458,7 @@
             });
         });
 
+        // FUNGSI KONVERSI PDF KE FOTO POSTER
         function convertPdfToImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -488,50 +474,53 @@
             }
 
             if (file.type === 'application/pdf') {
-                Swal.fire({ title: 'Membaca PDF...', text: 'Mengonversi halaman pertama PDF ke gambar.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                Swal.fire({ title: 'Membaca PDF Poster...', text: 'Mengonversi halaman pertama PDF ke gambar.', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                 
                 const fileReader = new FileReader();
                 fileReader.onload = function() {
                     const typedarray = new Uint8Array(this.result);
                     pdfjsLib.getDocument(typedarray).promise.then(pdf => pdf.getPage(1)).then(page => {
-                        const viewport = page.getViewport({ scale: 1.5 });
+                        const viewport = page.getViewport({ scale: 2 border: true });
                         const canvas = document.createElement('canvas');
                         const context = canvas.getContext('2d');
                         canvas.height = viewport.height;
                         canvas.width = viewport.width;
 
                         page.render({ canvasContext: context, viewport: viewport }).promise.then(() => {
-                            const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+                            const base64Image = canvas.toDataURL('image/jpeg', 0.9);
                             document.getElementById('paslonFoto').value = base64Image;
                             document.getElementById('paslonPreviewImg').src = base64Image;
                             Swal.close();
-                            Swal.fire('Sukses', 'PDF berhasil diubah menjadi foto paslon!', 'success');
+                            Swal.fire('Sukses', 'Poster PDF berhasil diubah menjadi gambar!', 'success');
                         });
-                    }).catch(() => Swal.fire('Gagal', 'File PDF tidak valid.', 'error'));
+                    }).catch(() => Swal.fire('Gagal', 'File PDF tidak dapat diproses.', 'error'));
                 };
                 fileReader.readAsArrayBuffer(file);
             }
         }
 
+        // BINGKAI FOTO POSTER KANDIDAT YANG JAUH LEBIH BESAR (Tinggi: h-[520px])
         function renderBallotCards() {
             document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
-                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-xl border-2 border-slate-200 p-4 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between">
-                    <div class="absolute top-3 right-3 bg-brandPrimary text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">${p.no}</div>
+                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-5 shadow-md hover:shadow-xl cursor-pointer transition-all duration-200 relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-6 right-6 bg-brandPrimary text-white font-black text-sm w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white">${p.no}</div>
                     <div>
-                        <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full bg-slate-100 mb-3 border object-cover">
-                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
-                        <p class="text-xs text-slate-600 text-center font-semibold mb-2">"${p.visi}"</p>
+                        <div class="w-full h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-1">
+                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
+                        </div>
+                        <h4 class="font-black text-center text-slate-800 text-lg uppercase tracking-wide my-2">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
 
             document.getElementById('containerMpk').innerHTML = paslonMpk.map(p => `
-                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-xl border-2 border-slate-200 p-4 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between">
-                    <div class="absolute top-3 right-3 bg-brandSecondary text-white text-xs font-bold w-7 h-7 rounded-full flex items-center justify-center">${p.no}</div>
+                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-5 shadow-md hover:shadow-xl cursor-pointer transition-all duration-200 relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-6 right-6 bg-brandSecondary text-white font-black text-sm w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-10 border-2 border-white">${p.no}</div>
                     <div>
-                        <img src="${p.foto}" class="w-24 h-24 mx-auto rounded-full bg-slate-100 mb-3 border object-cover">
-                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
-                        <p class="text-xs text-slate-600 text-center font-semibold mb-2">"${p.visi}"</p>
+                        <div class="w-full h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-1">
+                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
+                        </div>
+                        <h4 class="font-black text-center text-slate-800 text-lg uppercase tracking-wide my-2">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
@@ -540,14 +529,14 @@
         function selectCandidate(type, id) {
             if (type === 'OSIS') {
                 selectedOsis = id;
-                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50'));
-                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50');
+                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50', 'ring-4', 'ring-brandPrimary/30'));
+                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50', 'ring-4', 'ring-brandPrimary/30');
                 const paslon = paslonOsis.find(p => p.id === id);
                 document.getElementById('summaryOsis').innerText = `Paslon ${paslon.no}`;
             } else {
                 selectedMpk = id;
-                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50'));
-                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50');
+                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50', 'ring-4', 'ring-brandSecondary/30'));
+                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50', 'ring-4', 'ring-brandSecondary/30');
                 const paslon = paslonMpk.find(p => p.id === id);
                 document.getElementById('summaryMpk').innerText = `Paslon ${paslon.no}`;
             }
@@ -698,7 +687,6 @@
             const filter = document.getElementById('filterStatus').value;
             
             let allDpt = Object.entries(dptData).map(([key, val]) => ({ id: key, ...val }));
-
             allDpt.sort((a, b) => (a.rowOrder || 0) - (b.rowOrder || 0));
 
             let filtered = allDpt.filter(item => {
@@ -812,20 +800,20 @@
             document.getElementById('adminPaslonOsis').innerHTML = paslonOsis.map(p => `
                 <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
                     <div class="flex items-center space-x-2">
-                        <img src="${p.foto}" class="w-8 h-8 rounded-full object-cover">
+                        <img src="${p.foto}" class="w-8 h-8 rounded object-cover">
                         <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
                     </div>
-                    <button onclick="openPaslonModal('osis', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs">Edit</button>
+                    <button onclick="openPaslonModal('osis', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold">Edit Poster</button>
                 </div>
             `).join('');
 
             document.getElementById('adminPaslonMpk').innerHTML = paslonMpk.map(p => `
                 <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
                     <div class="flex items-center space-x-2">
-                        <img src="${p.foto}" class="w-8 h-8 rounded-full object-cover">
+                        <img src="${p.foto}" class="w-8 h-8 rounded object-cover">
                         <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
                     </div>
-                    <button onclick="openPaslonModal('mpk', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs">Edit</button>
+                    <button onclick="openPaslonModal('mpk', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold">Edit Poster</button>
                 </div>
             `).join('');
         }
@@ -840,9 +828,7 @@
             document.getElementById('paslonNama').value = target.nama;
             document.getElementById('paslonFoto').value = target.foto;
             document.getElementById('paslonPreviewImg').src = target.foto;
-            document.getElementById('paslonVisi').value = target.visi;
-            document.getElementById('paslonMisi').value = target.misi || '';
-            document.getElementById('modalPaslonTitle').innerText = `Edit Paslon ${category.toUpperCase()} (${target.no})`;
+            document.getElementById('modalPaslonTitle').innerText = `Edit Poster Paslon ${category.toUpperCase()} (${target.no})`;
             document.getElementById('modalPaslon').classList.remove('hidden');
             document.getElementById('modalPaslon').classList.add('flex');
         }
@@ -858,16 +844,14 @@
             const id = document.getElementById('paslonId').value;
             const nama = document.getElementById('paslonNama').value.trim();
             const foto = document.getElementById('paslonFoto').value.trim();
-            const visi = document.getElementById('paslonVisi').value.trim();
-            const misi = document.getElementById('paslonMisi').value.trim();
 
             const list = category === 'osis' ? [...paslonOsis] : [...paslonMpk];
             const idx = list.findIndex(p => p.id === id);
 
             if (idx !== -1) {
-                list[idx] = { ...list[idx], nama, foto, visi, misi };
+                list[idx] = { ...list[idx], nama, foto };
                 db.ref(`candidates/${category}`).set(list).then(() => {
-                    Swal.fire('Berhasil', 'Data disimpan!', 'success');
+                    Swal.fire('Berhasil', 'Poster kandidat berhasil diperbarui!', 'success');
                     closePaslonModal();
                 });
             }
