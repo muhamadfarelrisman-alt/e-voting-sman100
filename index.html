@@ -108,7 +108,7 @@
                 <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
             </div>
 
-            <!-- PASLON OSIS (GRID 2 KOLOM) -->
+            <!-- PASLON OSIS -->
             <div>
                 <div class="flex items-center space-x-2 mb-4">
                     <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
@@ -119,13 +119,13 @@
 
             <hr class="border-slate-300 my-6">
 
-            <!-- PASLON MPK (GRID 2 KOLOM DISAMAKAN DENGAN OSIS) -->
+            <!-- PASLON MPK -->
             <div>
                 <div class="flex items-center space-x-2 mb-4">
                     <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
                     <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" id="containerMpk"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
             </div>
 
             <!-- TOMBOL KIRIM SUARA -->
@@ -323,7 +323,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Poster Visi & Misi</label>
                     <div class="flex flex-col items-center space-y-2">
-                        <img id="paslonPreviewImg" src="" class="w-full h-64 rounded-lg object-contain border bg-slate-100 p-1">
+                        <img id="paslonPreviewImg" src="" class="w-full aspect-[3/4] rounded-lg object-cover border bg-slate-100 p-1">
                         <input type="text" id="paslonFoto" required placeholder="URL Poster atau Base64 Gambar" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                     </div>
                 </div>
@@ -499,14 +499,14 @@
             }
         }
 
-        // TAMPILAN KARTU PASLON (SERAGAM 100% UNTUK OSIS & MPK)
+        // TAMPILAN KARTU PASLON (RASIO ASPECT 3/4 & OBJECT COVER PRESISI KEDUA POSISI)
         function renderBallotCards() {
             document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
                 <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
                     <div class="absolute top-4 right-4 bg-brandPrimary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-[480px] rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
-                            <img src="${p.foto}" class="w-full h-full object-contain bg-slate-200">
+                        <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
+                            <img src="${p.foto}" class="w-full h-full object-cover">
                         </div>
                         <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
                     </div>
@@ -517,8 +517,8 @@
                 <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
                     <div class="absolute top-4 right-4 bg-brandSecondary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-[480px] rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
-                            <img src="${p.foto}" class="w-full h-full object-contain bg-slate-200">
+                        <div class="w-full aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
+                            <img src="${p.foto}" class="w-full h-full object-cover">
                         </div>
                         <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
                     </div>
