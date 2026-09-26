@@ -18,7 +18,7 @@
     <!-- PDF.js Library untuk Ekstrak PDF ke Foto -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compat Version) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -69,7 +69,7 @@
             <span id="syncTime" class="text-slate-500"></span>
         </div>
 
-        <!-- PAGE 1: LOGIN PEMILIH (SAMPEL/CONTOH TELAH DIHAPUS) -->
+        <!-- PAGE 1: LOGIN PEMILIH -->
         <section id="pageLogin" class="max-w-md mx-auto my-10 bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-slate-200">
             <div class="text-center mb-6">
                 <div class="inline-block p-3 bg-sky-100 text-brandSecondary rounded-full mb-2">
@@ -98,12 +98,12 @@
             </div>
         </section>
 
-        <!-- PAGE 2: BILIK SUARA (VOTING MEMAKAI POSTER PHOTO) -->
+        <!-- PAGE 2: BILIK SUARA (POSTER PEMILIHAN DIPERBESAR) -->
         <section id="pageVoting" class="hidden space-y-8">
             <div class="bg-blue-50 border-l-4 border-brandSecondary p-4 rounded-r-lg flex justify-between items-center">
                 <div>
                     <h2 class="text-lg font-bold text-slate-800" id="voterWelcome">Selamat Datang, Pemilih!</h2>
-                    <p class="text-xs text-slate-600">Klik kartu paslon untuk melihat dan menentukan pilihan Ketua OSIS & MPK.</p>
+                    <p class="text-xs text-slate-600">Klik kartu paslon untuk menentukan pilihan Ketua OSIS & MPK.</p>
                 </div>
                 <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
             </div>
@@ -114,7 +114,7 @@
                     <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
                     <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua OSIS</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerOsis"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8" id="containerOsis"></div>
             </div>
 
             <hr class="border-slate-300 my-6">
@@ -125,7 +125,7 @@
                     <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
                     <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8" id="containerMpk"></div>
             </div>
 
             <!-- TOMBOL KIRIM SUARA -->
@@ -243,7 +243,7 @@
                 </div>
             </div>
 
-            <!-- TABEL DPT MANAJEMEN DENGAN NAVIGASI SAMPAI DATA 639 -->
+            <!-- TABEL DPT MANAJEMEN -->
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-3">
                     <div>
@@ -323,7 +323,7 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Preview Poster Visi & Misi</label>
                     <div class="flex flex-col items-center space-y-2">
-                        <img id="paslonPreviewImg" src="" class="w-full h-48 rounded-lg object-contain border bg-slate-100 p-1">
+                        <img id="paslonPreviewImg" src="" class="w-full h-64 rounded-lg object-contain border bg-slate-100 p-1">
                         <input type="text" id="paslonFoto" required placeholder="URL Poster atau Base64 Gambar" class="w-full px-3 py-2 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-brandPrimary">
                     </div>
                 </div>
@@ -374,8 +374,9 @@
         <p>© 2026 KPUM SMAN 100 Jakarta. Sistem E-Voting Terintegrasi Cloud Realtime.</p>
     </footer>
 
-    <!-- JAVASCRIPT UTAMA -->
+    <!-- JAVASCRIPT LOGIK KANAN LENGKAP -->
     <script>
+        // Konfigurasi Firebase Realtime Database
         const firebaseConfig = {
             apiKey: "AIzaSyBBoS1kNu_3qz79_Qw_RG3QS1VFQVi0SBQ",
             authDomain: "evoting-sman100jkt.firebaseapp.com",
@@ -390,16 +391,17 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Data Awal Default Paslon
         let paslonOsis = [
-            { id: "O1", no: "01", nama: "Alena Syifa Syafii", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Alena" },
-            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Farzin" }
+            { id: "O1", no: "01", nama: "Alena Syifa Syafii", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Alena" },
+            { id: "O2", no: "02", nama: "Muhammad Farzin Aris Setiawan", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Farzin" }
         ];
 
         let paslonMpk = [
-            { id: "M1", no: "01", nama: "Shita Avara Nallini", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Shita" },
-            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Najwa" },
-            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", foto: "https://via.placeholder.com/400x550/0284c7/ffffff?text=Poster+Visi+Misi+Thyrisa" },
-            { id: "M4", no: "04", nama: "Zizi Amirah Azka", foto: "https://via.placeholder.com/400x550/1e3a8a/ffffff?text=Poster+Visi+Misi+Zizi" }
+            { id: "M1", no: "01", nama: "Shita Avara Nallini", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Shita" },
+            { id: "M2", no: "02", nama: "Najwa Aini Ahmad", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Najwa" },
+            { id: "M3", no: "03", nama: "Thyrisa Nur Rinjani", foto: "https://via.placeholder.com/600x850/0284c7/ffffff?text=Poster+Visi+Misi+Thyrisa" },
+            { id: "M4", no: "04", nama: "Zizi Amirah Azka", foto: "https://via.placeholder.com/600x850/1e3a8a/ffffff?text=Poster+Visi+Misi+Zizi" }
         ];
 
         let dptData = {};
@@ -413,6 +415,7 @@
         let currentPage = 1;
         let rowsPerPage = 10;
 
+        // Inisialisasi Event Listener Realtime
         window.addEventListener('DOMContentLoaded', () => {
             const paslonFotoInput = document.getElementById('paslonFoto');
             if (paslonFotoInput) {
@@ -421,6 +424,7 @@
                 });
             }
 
+            // Realtime Sync Status Koneksi Database
             db.ref('.info/connected').on('value', (snap) => {
                 const connected = snap.val();
                 const dbStatus = document.getElementById('dbStatus');
@@ -434,6 +438,7 @@
                 }
             });
 
+            // Sync Paslon OSIS & MPK
             db.ref('candidates/osis').on('value', (snap) => {
                 if (snap.exists()) paslonOsis = snap.val();
                 renderBallotCards();
@@ -446,19 +451,21 @@
                 renderAdminCandidates();
             });
 
+            // Sync DPT
             db.ref('dpt').on('value', (snapshot) => {
                 dptData = snapshot.val() || {};
                 updateAdminDashboard();
                 document.getElementById('syncTime').innerText = "Sync: " + new Date().toLocaleTimeString();
             });
 
+            // Sync Suara
             db.ref('votes').on('value', (snapshot) => {
                 votesData = snapshot.val() || {};
                 updateAdminDashboard();
             });
         });
 
-        // FUNGSI KONVERSI PDF KE FOTO POSTER
+        // Konversi PDF Poster Halaman Pertama Menjadi Gambar
         function convertPdfToImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -499,336 +506,230 @@
             }
         }
 
-        // TAMPILAN KARTU PASLON BERISI POSTER GAMBAR UTUH
+        // Render Kartu Paslon (Gambar Diperbesar & Proporsional)
         function renderBallotCards() {
             document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
-                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
-                    <div class="absolute top-4 right-4 bg-brandPrimary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
+                <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-md hover:shadow-xl cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-brandPrimary text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-80 rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
-                            <img src="${p.foto}" class="w-full h-full object-cover">
+                        <div class="w-full h-[480px] md:h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-2">
+                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
                         </div>
-                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
+                        <h4 class="font-bold text-center text-slate-800 text-base mb-1">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
 
             document.getElementById('containerMpk').innerHTML = paslonMpk.map(p => `
-                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
-                    <div class="absolute top-4 right-4 bg-brandSecondary text-white text-xs font-bold w-8 h-8 rounded-full flex items-center justify-center shadow z-10">${p.no}</div>
+                <div onclick="selectCandidate('MPK', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-4 shadow-md hover:shadow-xl cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
+                    <div class="absolute top-4 right-4 bg-brandSecondary text-white text-sm font-bold w-9 h-9 rounded-full flex items-center justify-center shadow-lg z-10">${p.no}</div>
                     <div>
-                        <div class="w-full h-80 rounded-xl overflow-hidden bg-slate-100 mb-3 border border-slate-200 flex items-center justify-center">
-                            <img src="${p.foto}" class="w-full h-full object-cover">
+                        <div class="w-full h-[480px] md:h-[520px] rounded-xl overflow-hidden bg-slate-50 mb-4 border border-slate-200 flex items-center justify-center p-2">
+                            <img src="${p.foto}" class="w-full h-full object-contain rounded-lg">
                         </div>
-                        <h4 class="font-bold text-center text-slate-800 text-sm mb-1">${p.nama}</h4>
+                        <h4 class="font-bold text-center text-slate-800 text-base mb-1">${p.nama}</h4>
                     </div>
                 </div>
             `).join('');
         }
 
-        function selectCandidate(type, id) {
-            if (type === 'OSIS') {
-                selectedOsis = id;
-                document.querySelectorAll('#containerOsis .candidate-card').forEach(el => el.classList.remove('border-brandPrimary', 'bg-blue-50', 'ring-2', 'ring-brandPrimary'));
-                document.getElementById(`card-${id}`).classList.add('border-brandPrimary', 'bg-blue-50', 'ring-2', 'ring-brandPrimary');
-                const paslon = paslonOsis.find(p => p.id === id);
-                document.getElementById('summaryOsis').innerText = `Paslon ${paslon.no}`;
-            } else {
-                selectedMpk = id;
-                document.querySelectorAll('#containerMpk .candidate-card').forEach(el => el.classList.remove('border-brandSecondary', 'bg-sky-50', 'ring-2', 'ring-brandSecondary'));
-                document.getElementById(`card-${id}`).classList.add('border-brandSecondary', 'bg-sky-50', 'ring-2', 'ring-brandSecondary');
-                const paslon = paslonMpk.find(p => p.id === id);
-                document.getElementById('summaryMpk').innerText = `Paslon ${paslon.no}`;
+        // Pilih Kandidat OSIS / MPK
+        function selectCandidate(category, candidateId) {
+            if (category === 'OSIS') {
+                selectedOsis = candidateId;
+                const candidate = paslonOsis.find(p => p.id === candidateId);
+                document.getElementById('summaryOsis').innerText = candidate ? candidate.nama : 'Belum Dipilih';
+                paslonOsis.forEach(p => {
+                    const card = document.getElementById(`card-${p.id}`);
+                    if (card) {
+                        if (p.id === candidateId) {
+                            card.classList.add('border-brandPrimary', 'ring-4', 'ring-blue-200');
+                            card.classList.remove('border-slate-200');
+                        } else {
+                            card.classList.remove('border-brandPrimary', 'ring-4', 'ring-blue-200');
+                            card.classList.add('border-slate-200');
+                        }
+                    }
+                });
+            } else if (category === 'MPK') {
+                selectedMpk = candidateId;
+                const candidate = paslonMpk.find(p => p.id === candidateId);
+                document.getElementById('summaryMpk').innerText = candidate ? candidate.nama : 'Belum Dipilih';
+                paslonMpk.forEach(p => {
+                    const card = document.getElementById(`card-${p.id}`);
+                    if (card) {
+                        if (p.id === candidateId) {
+                            card.classList.add('border-brandSecondary', 'ring-4', 'ring-sky-200');
+                            card.classList.remove('border-slate-200');
+                        } else {
+                            card.classList.remove('border-brandSecondary', 'ring-4', 'ring-sky-200');
+                            card.classList.add('border-slate-200');
+                        }
+                    }
+                });
             }
         }
 
+        // Login Pemilih (Validasi NIS + Token)
         function handleLogin(e) {
             e.preventDefault();
             const nis = document.getElementById('loginNis').value.trim();
             const token = document.getElementById('loginToken').value.trim().toUpperCase();
 
-            const allVoters = Object.values(dptData);
-            const voter = allVoters.find(v => String(v.nis) === nis && String(v.token) === token);
+            const dptKeys = Object.keys(dptData);
+            let foundKey = dptKeys.find(key => dptData[key].nis.toString() === nis && dptData[key].token.toUpperCase() === token);
 
-            if (!voter) return Swal.fire('Gagal Login', 'NIS / Token tidak valid!', 'error');
-            if (voter.status === 'SUDAH') return Swal.fire('Hak Pilih Habis', 'Siswa ini sudah memilih!', 'warning');
+            if (!foundKey) {
+                Swal.fire('Akses Ditolak', 'Kombinasi NIS dan Token tidak cocok / tidak ditemukan.', 'error');
+                return;
+            }
 
-            currentVoter = voter;
+            const voter = dptData[foundKey];
+            if (voter.status === 'SUDAH') {
+                Swal.fire('Sudah Memilih', 'Hak pilih dengan NIS ini sudah digunakan sebelumnya.', 'warning');
+                return;
+            }
+
+            currentVoter = { ...voter, key: foundKey };
             document.getElementById('voterWelcome').innerText = `Selamat Datang, ${voter.nama} (${voter.kelas})`;
+            
             document.getElementById('pageLogin').classList.add('hidden');
             document.getElementById('pageVoting').classList.remove('hidden');
+            
+            selectedOsis = null;
+            selectedMpk = null;
+            document.getElementById('summaryOsis').innerText = 'Belum Dipilih';
+            document.getElementById('summaryMpk').innerText = 'Belum Dipilih';
+            renderBallotCards();
         }
 
+        // Kirim Suara Pemilih
         function submitBallot() {
-            if (!selectedOsis || !selectedMpk) return Swal.fire('Pilihan Belum Lengkap', 'Pilih 1 OSIS & 1 MPK!', 'warning');
+            if (!selectedOsis || !selectedMpk) {
+                Swal.fire('Pilihan Belum Lengkap', 'Silakan pilih 1 Ketua OSIS dan 1 Ketua MPK.', 'info');
+                return;
+            }
 
             Swal.fire({
-                title: 'Kirim Suara?',
-                text: 'Pilihan tidak dapat diubah setelah dikirim.',
+                title: 'Konfirmasi Pilihan',
+                text: 'Apakah Anda yakin dengan pilihan Anda? Pilihan tidak dapat diubah.',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Kirim'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    const voteId = db.ref('votes').push().key;
-                    const docKey = currentVoter.id;
+                confirmButtonText: 'Ya, Kirim Suara',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const voteId = 'VOTE_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+                    const timestamp = new Date().toISOString();
+
                     const updates = {};
-                    updates[`/votes/${voteId}`] = { nis: currentVoter.nis, osis: selectedOsis, mpk: selectedMpk, timestamp: new Date().toISOString() };
-                    updates[`/dpt/${docKey}/status`] = 'SUDAH';
+                    updates[`/dpt/${currentVoter.key}/status`] = 'SUDAH';
+                    updates[`/votes/${voteId}`] = {
+                        osis: selectedOsis,
+                        mpk: selectedMpk,
+                        timestamp: timestamp
+                    };
 
                     db.ref().update(updates).then(() => {
-                        Swal.fire('Berhasil', 'Terima kasih telah memilih!', 'success').then(() => {
-                            location.reload();
+                        Swal.fire('Berhasil!', 'Suara Anda telah berhasil direkam secara anonim.', 'success').then(() => {
+                            currentVoter = null;
+                            document.getElementById('loginNis').value = '';
+                            document.getElementById('loginToken').value = '';
+                            document.getElementById('pageVoting').classList.add('hidden');
+                            document.getElementById('pageLogin').classList.remove('hidden');
                         });
+                    }).catch(err => {
+                        Swal.fire('Gagal Menyimpan Suara', err.message, 'error');
                     });
                 }
             });
         }
 
+        // Navigasi Admin / Pemilih
         function toggleNav() {
             if (isAdminLoggedIn) {
-                location.reload();
+                logoutAdmin();
             } else {
                 Swal.fire({
-                    title: 'Otentikasi Admin',
+                    title: 'Login Panitia / Admin',
                     input: 'password',
-                    inputPlaceholder: 'Password',
-                    showCancelButton: true
-                }).then((res) => {
-                    if (res.value === '100SEMPURNA') {
-                        isAdminLoggedIn = true;
-                        document.getElementById('pageLogin').classList.add('hidden');
-                        document.getElementById('pageVoting').classList.add('hidden');
-                        document.getElementById('pageAdmin').classList.remove('hidden');
-                        updateAdminDashboard();
-                        renderAdminCandidates();
-                    } else if(res.isConfirmed) {
-                        Swal.fire('Gagal', 'Password Salah!', 'error');
+                    inputLabel: 'Masukkan Kata Sandi Administrator',
+                    inputPlaceholder: 'Sandi Admin',
+                    showCancelButton: true,
+                    confirmButtonText: 'Masuk'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (result.value === 'admin100') {
+                            isAdminLoggedIn = true;
+                            document.getElementById('navBtnText').innerText = 'Keluar Admin';
+                            document.getElementById('navBtnIcon').className = 'fa-solid fa-right-from-bracket mr-1';
+                            document.getElementById('pageLogin').classList.add('hidden');
+                            document.getElementById('pageVoting').classList.add('hidden');
+                            document.getElementById('pageAdmin').classList.remove('hidden');
+                            updateAdminDashboard();
+                        } else {
+                            Swal.fire('Sandi Salah', 'Akses administrator ditolak.', 'error');
+                        }
                     }
                 });
             }
         }
 
-        function logoutAdmin() { toggleNav(); }
-
-        function triggerExcelUpload() { document.getElementById('excelFileInput').click(); }
-
-        function processExcelImport(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (evt) {
-                const data = new Uint8Array(evt.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
-
-                if (jsonData.length === 0) return Swal.fire('File Kosong', 'Tidak ada data di Excel.', 'error');
-
-                const updates = {};
-                let validCount = 0;
-
-                jsonData.forEach((row, index) => {
-                    const nis = String(row.NIS || row.nis || row.Nis || '').trim();
-                    const nama = String(row.Nama || row.nama || row.NAMA || '').trim();
-                    const kelas = String(row.Kelas || row.kelas || row.KELAS || '').trim();
-                    
-                    let token = String(row.Token || row.token || row.TOKEN || '').trim().toUpperCase();
-                    if (!token) {
-                        token = `TK${1001 + index}`;
-                    }
-
-                    const docKey = `dpt_${String(index + 1).padStart(4, '0')}`;
-
-                    if (nis || nama) {
-                        updates[`/dpt/${docKey}`] = { 
-                            id: docKey,
-                            nis: nis || `-`, 
-                            nama: nama || `-`, 
-                            kelas: kelas || `-`, 
-                            token: token, 
-                            status: 'BELUM', 
-                            rowOrder: index + 1
-                        };
-                        validCount++;
-                    }
-                });
-
-                db.ref('dpt').set(null).then(() => {
-                    return db.ref().update(updates);
-                }).then(() => {
-                    Swal.fire('Sukses Impor', `Berhasil mengunggah ${validCount} DPT dari data ke-1 sampai data ke-${validCount}!`, 'success');
-                }).catch(err => Swal.fire('Error Impor', err.message, 'error'));
-            };
-            reader.readAsArrayBuffer(file);
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            document.getElementById('navBtnText').innerText = 'Panel Admin';
+            document.getElementById('navBtnIcon').className = 'fa-solid fa-lock mr-1';
+            document.getElementById('pageAdmin').classList.add('hidden');
+            document.getElementById('pageLogin').classList.remove('hidden');
         }
 
-        function updateRowsPerPage() {
-            const val = document.getElementById('selectRowsPerPage').value;
-            if (val === 'ALL') {
-                rowsPerPage = 99999;
-            } else {
-                rowsPerPage = parseInt(val);
-            }
-            currentPage = 1;
-            renderDptTable();
-        }
-
-        function gotoPage() {
-            const pageInput = parseInt(document.getElementById('gotoPageInput').value);
-            if (pageInput && pageInput > 0) {
-                currentPage = pageInput;
-                renderDptTable();
-            }
-        }
-
-        function renderDptTable() {
-            const search = document.getElementById('searchDpt').value.toLowerCase();
-            const filter = document.getElementById('filterStatus').value;
-            
-            let allDpt = Object.entries(dptData).map(([key, val]) => ({ id: key, ...val }));
-            allDpt.sort((a, b) => (a.rowOrder || 0) - (b.rowOrder || 0));
-
-            let filtered = allDpt.filter(item => {
-                const matchSearch = (item.nis && String(item.nis).toLowerCase().includes(search)) || 
-                                    (item.nama && String(item.nama).toLowerCase().includes(search));
-                const matchFilter = filter === 'ALL' || item.status === filter;
-                return matchSearch && matchFilter;
-            });
-
-            const total = filtered.length;
-            const totalPages = Math.ceil(total / rowsPerPage) || 1;
-            if (currentPage > totalPages) currentPage = totalPages;
-
-            const start = (currentPage - 1) * rowsPerPage;
-            const paged = filtered.slice(start, start + rowsPerPage);
-
-            document.getElementById('tbodyDpt').innerHTML = paged.map((item, index) => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-bold text-slate-600">${item.rowOrder || (start + index + 1)}</td>
-                    <td class="p-3 font-semibold">${item.nis}</td>
-                    <td class="p-3 font-bold text-slate-800">${item.nama}</td>
-                    <td class="p-3">${item.kelas}</td>
-                    <td class="p-3"><code class="bg-slate-100 px-2 py-0.5 rounded text-slate-700 font-bold">${item.token}</code></td>
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${item.status === 'SUDAH' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                            ${item.status === 'SUDAH' ? 'Sudah Memilih' : 'Belum Memilih'}
-                        </span>
-                    </td>
-                    <td class="p-3 text-center space-x-1">
-                        <button onclick="editDpt('${item.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteDpt('${item.id}')" class="px-2 py-1 bg-rose-500 text-white rounded text-[10px] font-bold"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-
-            document.getElementById('tableInfo').innerText = `Menampilkan ${total === 0 ? 0 : start + 1} - ${Math.min(start + rowsPerPage, total)} dari ${total} DPT`;
-
-            let pageBtns = '';
-            let maxVisibleBtns = 5;
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + maxVisibleBtns - 1);
-
-            if (startPage > 1) {
-                pageBtns += `<button onclick="changePage(1)" class="px-2 py-1 rounded text-xs font-bold bg-slate-200 text-slate-700">1</button>`;
-                if (startPage > 2) pageBtns += `<span class="text-xs text-slate-400">...</span>`;
-            }
-
-            for (let i = startPage; i <= endPage; i++) {
-                pageBtns += `<button onclick="changePage(${i})" class="px-2.5 py-1 rounded text-xs font-bold ${i === currentPage ? 'bg-brandPrimary text-white' : 'bg-slate-200 text-slate-700'}">${i}</button>`;
-            }
-
-            if (endPage < totalPages) {
-                if (endPage < totalPages - 1) pageBtns += `<span class="text-xs text-slate-400">...</span>`;
-                pageBtns += `<button onclick="changePage(${totalPages})" class="px-2 py-1 rounded text-xs font-bold bg-slate-200 text-slate-700">${totalPages}</button>`;
-            }
-
-            document.getElementById('tablePagination').innerHTML = pageBtns;
-        }
-
-        function changePage(p) { currentPage = p; renderDptTable(); }
-
-        function updateAdminDashboard() {
-            if (!isAdminLoggedIn) return;
-            const totalDpt = Object.keys(dptData).length;
-            const votesArr = Object.values(votesData);
-            const suaraMasuk = votesArr.length;
-
-            document.getElementById('statTotalDpt').innerText = totalDpt;
-            document.getElementById('statSuaraMasuk').innerText = suaraMasuk;
-            document.getElementById('statBelumMemilih').innerText = Math.max(0, totalDpt - suaraMasuk);
-            document.getElementById('statPartisipasi').innerText = (totalDpt > 0 ? ((suaraMasuk / totalDpt) * 100).toFixed(1) : 0) + '%';
-
-            renderCharts(votesArr);
-            renderDptTable();
-        }
-
-        function renderCharts(votesArr) {
-            const osisCounts = {};
-            paslonOsis.forEach(p => osisCounts[p.id] = 0);
-            votesArr.forEach(v => { if(osisCounts[v.osis] !== undefined) osisCounts[v.osis]++; });
-
-            const mpkCounts = {};
-            paslonMpk.forEach(p => mpkCounts[p.id] = 0);
-            votesArr.forEach(v => { if(mpkCounts[v.mpk] !== undefined) mpkCounts[v.mpk]++; });
-
-            const ctxOsis = document.getElementById('chartOsis').getContext('2d');
-            if (chartOsisInstance) chartOsisInstance.destroy();
-            chartOsisInstance = new Chart(ctxOsis, {
-                type: 'doughnut',
-                data: {
-                    labels: paslonOsis.map(p => `Paslon ${p.no}`),
-                    datasets: [{ data: paslonOsis.map(p => osisCounts[p.id]), backgroundColor: ['#1e3a8a', '#0284c7', '#f59e0b', '#10b981'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            const ctxMpk = document.getElementById('chartMpk').getContext('2d');
-            if (chartMpkInstance) chartMpkInstance.destroy();
-            chartMpkInstance = new Chart(ctxMpk, {
-                type: 'bar',
-                data: {
-                    labels: paslonMpk.map(p => `Paslon ${p.no}`),
-                    datasets: [{ label: 'Suara', data: paslonMpk.map(p => mpkCounts[p.id]), backgroundColor: ['#0284c7', '#38bdf8', '#0284c7', '#0369a1'] }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
+        // Render Pengelolaan Candidates di Panel Admin
         function renderAdminCandidates() {
-            if (!isAdminLoggedIn) return;
-            document.getElementById('adminPaslonOsis').innerHTML = paslonOsis.map(p => `
-                <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
-                    <div class="flex items-center space-x-2">
-                        <img src="${p.foto}" class="w-8 h-8 rounded object-cover">
-                        <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
+            const containerOsis = document.getElementById('adminPaslonOsis');
+            const containerMpk = document.getElementById('adminPaslonMpk');
+            
+            if (!containerOsis || !containerMpk) return;
+
+            containerOsis.innerHTML = paslonOsis.map(p => `
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 border rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.foto}" class="w-10 h-10 object-cover rounded">
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">[${p.no}] ${p.nama}</p>
+                        </div>
                     </div>
-                    <button onclick="openPaslonModal('osis', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold">Edit Poster</button>
+                    <button onclick="openPaslonModal('OSIS', '${p.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded text-[11px]">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </button>
                 </div>
             `).join('');
 
-            document.getElementById('adminPaslonMpk').innerHTML = paslonMpk.map(p => `
-                <div class="flex items-center justify-between p-2 bg-slate-50 rounded border">
-                    <div class="flex items-center space-x-2">
-                        <img src="${p.foto}" class="w-8 h-8 rounded object-cover">
-                        <span class="text-xs font-bold">${p.no}. ${p.nama}</span>
+            containerMpk.innerHTML = paslonMpk.map(p => `
+                <div class="flex items-center justify-between p-2.5 bg-slate-50 border rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.foto}" class="w-10 h-10 object-cover rounded">
+                        <div>
+                            <p class="font-bold text-xs text-slate-800">[${p.no}] ${p.nama}</p>
+                        </div>
                     </div>
-                    <button onclick="openPaslonModal('mpk', '${p.id}')" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold">Edit Poster</button>
+                    <button onclick="openPaslonModal('MPK', '${p.id}')" class="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded text-[11px]">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </button>
                 </div>
             `).join('');
         }
 
         function openPaslonModal(category, id) {
-            const list = category === 'osis' ? paslonOsis : paslonMpk;
-            const target = list.find(p => p.id === id);
-            if (!target) return;
+            const list = category === 'OSIS' ? paslonOsis : paslonMpk;
+            const item = list.find(p => p.id === id);
+            if (!item) return;
 
             document.getElementById('paslonCategory').value = category;
             document.getElementById('paslonId').value = id;
-            document.getElementById('paslonNama').value = target.nama;
-            document.getElementById('paslonFoto').value = target.foto;
-            document.getElementById('paslonPreviewImg').src = target.foto;
-            document.getElementById('modalPaslonTitle').innerText = `Edit Poster Paslon ${category.toUpperCase()} (${target.no})`;
+            document.getElementById('paslonNama').value = item.nama;
+            document.getElementById('paslonFoto').value = item.foto;
+            document.getElementById('paslonPreviewImg').src = item.foto;
+            document.getElementById('modalPaslonTitle').innerText = `Edit Paslon ${category} - No. ${item.no}`;
             document.getElementById('modalPaslon').classList.remove('hidden');
             document.getElementById('modalPaslon').classList.add('flex');
         }
@@ -845,24 +746,189 @@
             const nama = document.getElementById('paslonNama').value.trim();
             const foto = document.getElementById('paslonFoto').value.trim();
 
-            const list = category === 'osis' ? [...paslonOsis] : [...paslonMpk];
+            const list = category === 'OSIS' ? [...paslonOsis] : [...paslonMpk];
             const idx = list.findIndex(p => p.id === id);
-
             if (idx !== -1) {
-                list[idx] = { ...list[idx], nama, foto };
-                db.ref(`candidates/${category}`).set(list).then(() => {
-                    Swal.fire('Berhasil', 'Poster kandidat berhasil diperbarui!', 'success');
+                list[idx].nama = nama;
+                list[idx].foto = foto;
+
+                const path = category === 'OSIS' ? 'candidates/osis' : 'candidates/mpk';
+                db.ref(path).set(list).then(() => {
                     closePaslonModal();
+                    Swal.fire('Berhasil', 'Data paslon dan poster berhasil diperbarui!', 'success');
                 });
             }
         }
 
-        function openDptModal() {
-            document.getElementById('editDocId').value = '';
-            document.getElementById('modalNis').value = '';
-            document.getElementById('modalNama').value = '';
-            document.getElementById('modalKelas').value = '';
-            generateSequentialToken();
+        // Perbarui Statistik & Grafik Admin
+        function updateAdminDashboard() {
+            const totalDpt = Object.keys(dptData).length;
+            const suaraMasuk = Object.values(dptData).filter(d => d.status === 'SUDAH').length;
+            const belumMemilih = totalDpt - suaraMasuk;
+            const partisipasi = totalDpt > 0 ? ((suaraMasuk / totalDpt) * 100).toFixed(1) : 0;
+
+            document.getElementById('statTotalDpt').innerText = totalDpt;
+            document.getElementById('statSuaraMasuk').innerText = suaraMasuk;
+            document.getElementById('statBelumMemilih').innerText = belumMemilih;
+            document.getElementById('statPartisipasi').innerText = `${partisipasi}%`;
+
+            renderCharts();
+            renderDptTable();
+        }
+
+        // Render Grafik Perolehan Suara Realtime
+        function renderCharts() {
+            const votesList = Object.values(votesData);
+            
+            // Hitung OSIS
+            const countOsis = {};
+            paslonOsis.forEach(p => countOsis[p.id] = 0);
+            votesList.forEach(v => { if(countOsis[v.osis] !== undefined) countOsis[v.osis]++; });
+
+            // Hitung MPK
+            const countMpk = {};
+            paslonMpk.forEach(p => countMpk[p.id] = 0);
+            votesList.forEach(v => { if(countMpk[v.mpk] !== undefined) countMpk[v.mpk]++; });
+
+            // Chart OSIS
+            const ctxOsis = document.getElementById('chartOsis').getContext('2d');
+            if (chartOsisInstance) chartOsisInstance.destroy();
+            chartOsisInstance = new Chart(ctxOsis, {
+                type: 'pie',
+                data: {
+                    labels: paslonOsis.map(p => `[${p.no}] ${p.nama}`),
+                    datasets: [{
+                        data: paslonOsis.map(p => countOsis[p.id]),
+                        backgroundColor: ['#1e3a8a', '#0284c7', '#f59e0b', '#10b981']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // Chart MPK
+            const ctxMpk = document.getElementById('chartMpk').getContext('2d');
+            if (chartMpkInstance) chartMpkInstance.destroy();
+            chartMpkInstance = new Chart(ctxMpk, {
+                type: 'bar',
+                data: {
+                    labels: paslonMpk.map(p => `[${p.no}] ${p.nama}`),
+                    datasets: [{
+                        label: 'Perolehan Suara',
+                        data: paslonMpk.map(p => countMpk[p.id]),
+                        backgroundColor: '#0284c7'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            });
+        }
+
+        // Manajemen Tabel DPT + Paginated Control (Bisa Tampil 639+ Data Utama)
+        function updateRowsPerPage() {
+            const val = document.getElementById('selectRowsPerPage').value;
+            rowsPerPage = val === 'ALL' ? 'ALL' : parseInt(val);
+            currentPage = 1;
+            renderDptTable();
+        }
+
+        function gotoPage() {
+            const inputVal = parseInt(document.getElementById('gotoPageInput').value);
+            if (inputVal && inputVal > 0) {
+                currentPage = inputVal;
+                renderDptTable();
+            }
+        }
+
+        function renderDptTable() {
+            const tbody = document.getElementById('tbodyDpt');
+            const search = document.getElementById('searchDpt').value.toLowerCase();
+            const filter = document.getElementById('filterStatus').value;
+
+            let filtered = Object.keys(dptData).map(key => ({ ...dptData[key], key }));
+
+            if (search) {
+                filtered = filtered.filter(item => 
+                    item.nis.toString().toLowerCase().includes(search) || 
+                    item.nama.toLowerCase().includes(search)
+                );
+            }
+
+            if (filter !== 'ALL') {
+                filtered = filtered.filter(item => item.status === filter);
+            }
+
+            const totalFiltered = filtered.length;
+            let displayData = filtered;
+            let totalPages = 1;
+
+            if (rowsPerPage !== 'ALL') {
+                totalPages = Math.ceil(totalFiltered / rowsPerPage) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                const start = (currentPage - 1) * rowsPerPage;
+                displayData = filtered.slice(start, start + rowsPerPage);
+            }
+
+            tbody.innerHTML = displayData.length ? displayData.map((item, index) => {
+                const noIdx = rowsPerPage === 'ALL' ? index + 1 : ((currentPage - 1) * rowsPerPage) + index + 1;
+                const isSudah = item.status === 'SUDAH';
+                return `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-semibold text-slate-500">${noIdx}</td>
+                        <td class="p-3 font-bold text-slate-800">${item.nis}</td>
+                        <td class="p-3 font-semibold text-slate-700">${item.nama}</td>
+                        <td class="p-3 text-slate-600">${item.kelas}</td>
+                        <td class="p-3 font-mono font-bold text-slate-700">${item.token}</td>
+                        <td class="p-3">
+                            <span class="px-2.5 py-1 text-[10px] font-bold rounded-full ${isSudah ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                                ${isSudah ? 'Sudah Memilih' : 'Belum Memilih'}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center space-x-1">
+                            <button onclick="openDptModal('${item.key}')" class="px-2 py-1 bg-sky-500 text-white rounded text-[10px] font-bold">Edit</button>
+                            <button onclick="deleteDpt('${item.key}')" class="px-2 py-1 bg-rose-500 text-white rounded text-[10px] font-bold">Hapus</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') : `<tr><td colspan="7" class="p-4 text-center text-slate-400">Tidak ada data DPT ditemukan.</td></tr>`;
+
+            // Render Navigasi Paginasi
+            document.getElementById('tableInfo').innerText = `Menampilkan ${displayData.length} dari ${totalFiltered} DPT`;
+            const paginationDiv = document.getElementById('tablePagination');
+            
+            if (rowsPerPage === 'ALL' || totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+            } else {
+                paginationDiv.innerHTML = `
+                    <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled class="px-2 py-0.5 bg-slate-200 text-slate-400 text-xs rounded font-bold cursor-not-allowed"' : 'class="px-2 py-0.5 bg-brandPrimary text-white text-xs rounded font-bold"'}>Prev</button>
+                    <span class="text-xs font-bold px-1">${currentPage} / ${totalPages}</span>
+                    <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled class="px-2 py-0.5 bg-slate-200 text-slate-400 text-xs rounded font-bold cursor-not-allowed"' : 'class="px-2 py-0.5 bg-brandPrimary text-white text-xs rounded font-bold"'}>Next</button>
+                `;
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderDptTable();
+        }
+
+        // CRUD Modal DPT
+        function openDptModal(key = null) {
+            if (key && dptData[key]) {
+                const d = dptData[key];
+                document.getElementById('editDocId').value = key;
+                document.getElementById('modalNis').value = d.nis;
+                document.getElementById('modalNama').value = d.nama;
+                document.getElementById('modalKelas').value = d.kelas;
+                document.getElementById('modalToken').value = d.token;
+                document.getElementById('modalDptTitle').innerText = 'Edit DPT Manual';
+            } else {
+                document.getElementById('editDocId').value = '';
+                document.getElementById('modalNis').value = '';
+                document.getElementById('modalNama').value = '';
+                document.getElementById('modalKelas').value = '';
+                document.getElementById('modalToken').value = '';
+                document.getElementById('modalDptTitle').innerText = 'Tambah DPT Manual';
+                generateSequentialToken();
+            }
             document.getElementById('modalDpt').classList.remove('hidden');
             document.getElementById('modalDpt').classList.add('flex');
         }
@@ -873,83 +939,152 @@
         }
 
         function generateSequentialToken() {
-            const nextIndex = Object.keys(dptData).length + 1;
-            document.getElementById('modalToken').value = `TK${1000 + nextIndex}`;
+            const count = Object.keys(dptData).length + 1;
+            const rand = Math.random().toString(36).substring(2, 5).toUpperCase();
+            document.getElementById('modalToken').value = `TKN${count}${rand}`;
         }
 
         function saveDptManual(e) {
             e.preventDefault();
-            const editId = document.getElementById('editDocId').value;
+            const key = document.getElementById('editDocId').value;
             const nis = document.getElementById('modalNis').value.trim();
             const nama = document.getElementById('modalNama').value.trim();
             const kelas = document.getElementById('modalKelas').value.trim();
             const token = document.getElementById('modalToken').value.trim().toUpperCase();
 
-            const docKey = editId || `dpt_${String(Object.keys(dptData).length + 1).padStart(4, '0')}`;
-            const payload = { 
-                id: docKey,
-                nis, nama, kelas, token, 
-                status: dptData[docKey]?.status || 'BELUM', 
-                rowOrder: dptData[docKey]?.rowOrder || (Object.keys(dptData).length + 1)
+            const payload = {
+                nis: nis,
+                nama: nama,
+                kelas: kelas,
+                token: token,
+                status: key && dptData[key] ? dptData[key].status : 'BELUM'
             };
 
-            db.ref(`dpt/${docKey}`).set(payload).then(() => {
-                Swal.fire('Berhasil', 'Data DPT disimpan!', 'success');
+            const targetRef = key ? db.ref(`dpt/${key}`) : db.ref('dpt').push();
+            targetRef.set(payload).then(() => {
                 closeDptModal();
+                Swal.fire('Berhasil', 'Data DPT disimpan!', 'success');
             });
         }
 
-        function editDpt(id) {
-            const item = dptData[id];
-            if (!item) return;
-            document.getElementById('editDocId').value = id;
-            document.getElementById('modalNis').value = item.nis;
-            document.getElementById('modalNama').value = item.nama;
-            document.getElementById('modalKelas').value = item.kelas;
-            document.getElementById('modalToken').value = item.token;
-            document.getElementById('modalDpt').classList.remove('hidden');
-            document.getElementById('modalDpt').classList.add('flex');
-        }
-
-        function deleteDpt(id) {
-            Swal.fire({ title: 'Hapus DPT?', icon: 'warning', showCancelButton: true }).then((res) => {
-                if (res.isConfirmed) db.ref(`dpt/${id}`).remove();
+        function deleteDpt(key) {
+            Swal.fire({
+                title: 'Hapus Pemilih?',
+                text: 'Data DPT ini akan dihapus permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Hapus'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    db.ref(`dpt/${key}`).remove();
+                }
             });
         }
 
+        // Impor Data Excel Masal
+        function triggerExcelUpload() {
+            document.getElementById('excelFileInput').click();
+        }
+
+        function processExcelImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Swal.fire({ title: 'Mengunggah DPT Excel...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                if (jsonData.length === 0) {
+                    Swal.fire('Gagal', 'File Excel kosong atau format tidak sesuai.', 'error');
+                    return;
+                }
+
+                const updates = {};
+                jsonData.forEach((row, idx) => {
+                    const nis = row['NIS'] || row['nis'] || (1000 + idx);
+                    const nama = row['NAMA'] || row['Nama'] || row['nama'] || `Siswa ${idx + 1}`;
+                    const kelas = row['KELAS'] || row['Kelas'] || row['kelas'] || 'X';
+                    const token = row['TOKEN'] || row['Token'] || row['token'] || Math.random().toString(36).substring(2, 7).toUpperCase();
+
+                    const newKey = db.ref('dpt').push().key;
+                    updates[`/dpt/${newKey}`] = {
+                        nis: nis.toString(),
+                        nama: nama.toString(),
+                        kelas: kelas.toString(),
+                        token: token.toString().toUpperCase(),
+                        status: 'BELUM'
+                    };
+                });
+
+                db.ref().update(updates).then(() => {
+                    Swal.fire('Impor Berhasil', `Berhasil mengimpor ${jsonData.length} pemilih.`, 'success');
+                    document.getElementById('excelFileInput').value = '';
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Ekspor Rekapitulasi Data DPT ke Excel
         function exportToExcel() {
-            let allDpt = Object.values(dptData);
-            allDpt.sort((a, b) => (a.rowOrder || 0) - (b.rowOrder || 0));
-            if (allDpt.length === 0) return Swal.fire('Data Kosong', 'Tidak ada data untuk diekspor.', 'info');
-            
-            const exportData = allDpt.map((item, idx) => ({
-                "No": item.rowOrder || (idx + 1),
-                "NIS": item.nis,
-                "Nama Siswa": item.nama,
-                "Kelas": item.kelas,
-                "Token": item.token,
-                "Status": item.status
+            const exportData = Object.values(dptData).map((d, i) => ({
+                'No': i + 1,
+                'NIS': d.nis,
+                'Nama Pemilih': d.nama,
+                'Kelas': d.kelas,
+                'Token': d.token,
+                'Status Memilih': d.status
             }));
 
             const ws = XLSX.utils.json_to_sheet(exportData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "DPT SMAN 100");
-            XLSX.writeFile(wb, "Rekap_DPT_SMAN100.xlsx");
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap_DPT");
+            XLSX.writeFile(wb, "Rekapitulasi_EVoting_SMAN100.xlsx");
         }
 
-        function resetAllDPT() {
-            Swal.fire({ title: 'Reset Seluruh DPT?', text: 'Data DPT akan dihapus permanen.', icon: 'warning', showCancelButton: true }).then(res => {
-                if (res.isConfirmed) db.ref('dpt').remove();
-            });
-        }
-
+        // Reset Total Suara Masuk
         function resetAllVotes() {
-            Swal.fire({ title: 'Reset Suara?', text: 'Seluruh perolehan suara akan di-nol-kan.', icon: 'warning', showCancelButton: true }).then(res => {
+            Swal.fire({
+                title: 'Reset Seluruh Suara Masuk?',
+                text: 'Perolehan suara akan dikosongkan dan status DPT dikembalikan menjadi "Belum Memilih". Tindakan ini tidak dapat dibatalkan!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                confirmButtonText: 'Ya, Reset Suara'
+            }).then((res) => {
                 if (res.isConfirmed) {
                     const updates = {};
                     updates['/votes'] = null;
-                    Object.keys(dptData).forEach(k => updates[`/dpt/${k}/status`] = 'BELUM');
-                    db.ref().update(updates).then(() => Swal.fire('Berhasil', 'Suara di-reset.', 'success'));
+                    Object.keys(dptData).forEach(k => {
+                        updates[`/dpt/${k}/status`] = 'BELUM';
+                    });
+
+                    db.ref().update(updates).then(() => {
+                        Swal.fire('Suara Direset', 'Seluruh rekaman suara telah berhasil dikosongkan.', 'success');
+                    });
+                }
+            });
+        }
+
+        // Reset Seluruh DPT
+        function resetAllDPT() {
+            Swal.fire({
+                title: 'Hapus Seluruh Data DPT?',
+                text: 'Seluruh daftar pemilih tetap akan dihapus bersih dari database cloud.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                confirmButtonText: 'Hapus Semua DPT'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    db.ref('dpt').remove().then(() => {
+                        Swal.fire('DPT Direset', 'Semua data pemilih telah dihapus.', 'success');
+                    });
                 }
             });
         }
