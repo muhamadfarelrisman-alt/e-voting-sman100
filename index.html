@@ -108,7 +108,7 @@
                 <span class="bg-emerald-100 text-emerald-800 font-semibold px-3 py-1 rounded-full text-xs">Hak Pilih Aktif</span>
             </div>
 
-            <!-- PASLON OSIS -->
+            <!-- PASLON OSIS (GRID 2 KOLOM) -->
             <div>
                 <div class="flex items-center space-x-2 mb-4">
                     <span class="bg-brandPrimary text-white font-bold px-3 py-1 rounded-lg text-sm">1</span>
@@ -119,13 +119,13 @@
 
             <hr class="border-slate-300 my-6">
 
-            <!-- PASLON MPK -->
+            <!-- PASLON MPK (GRID 2 KOLOM DISAMAKAN DENGAN OSIS) -->
             <div>
                 <div class="flex items-center space-x-2 mb-4">
                     <span class="bg-brandSecondary text-white font-bold px-3 py-1 rounded-lg text-sm">2</span>
                     <h3 class="text-xl font-bold text-slate-800">Pemilihan Ketua MPK</h3>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="containerMpk"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6" id="containerMpk"></div>
             </div>
 
             <!-- TOMBOL KIRIM SUARA -->
@@ -499,7 +499,7 @@
             }
         }
 
-        // TAMPILAN KARTU PASLON (UKURAN BINGKAI DISESUAIKAN H-480PX UNTUK OSIS & MPK)
+        // TAMPILAN KARTU PASLON (SERAGAM 100% UNTUK OSIS & MPK)
         function renderBallotCards() {
             document.getElementById('containerOsis').innerHTML = paslonOsis.map(p => `
                 <div onclick="selectCandidate('OSIS', '${p.id}')" id="card-${p.id}" class="candidate-card bg-white rounded-2xl border-2 border-slate-200 p-3 shadow-sm hover:shadow-md cursor-pointer transition relative flex flex-col justify-between overflow-hidden">
